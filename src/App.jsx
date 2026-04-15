@@ -20,7 +20,47 @@ const SERVICES = [
   { id: 11, category: "Add-Ons", icon: "✿", name: "Nail Fix (Add-On)", description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.", duration: 10, priceLabel: "$5.00 per nail" },
 ];
 
-const TIMES = ["9:00 AM","9:45 AM","10:30 AM","11:15 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM"];
+// Availability: key is "YYYY-M-D", value is array of available times
+const AVAILABILITY = {
+  // April 2026
+  "2026-4-18": ["10:00 AM", "2:00 PM", "6:00 PM"],
+  "2026-4-19": ["4:00 PM"],
+  "2026-4-20": ["1:00 PM", "5:00 PM"],
+  "2026-4-21": ["12:00 PM", "5:00 PM"],
+  "2026-4-22": ["10:00 AM", "3:00 PM"],
+  "2026-4-24": ["12:00 PM", "4:00 PM"],
+  "2026-4-25": ["10:00 AM", "3:00 PM"],
+  "2026-4-27": ["9:00 AM", "2:00 PM"],
+  "2026-4-28": ["1:00 PM", "5:00 PM"],
+  "2026-4-29": ["11:00 AM", "4:00 PM"],
+  // May 2026
+  "2026-5-1":  ["10:00 AM", "3:00 PM"],
+  "2026-5-4":  ["10:00 AM", "4:00 PM"],
+  "2026-5-5":  ["9:00 AM", "4:00 PM"],
+  "2026-5-6":  ["10:00 AM", "3:00 PM"],
+  "2026-5-11": ["9:00 AM", "3:00 PM", "6:00 PM"],
+  "2026-5-12": ["10:00 AM", "3:00 PM", "6:00 PM"],
+  "2026-5-13": ["10:00 AM", "3:00 PM"],
+  "2026-5-15": ["9:00 AM", "3:00 PM"],
+  "2026-5-17": ["10:00 AM", "2:00 PM", "5:00 PM"],
+  "2026-5-18": ["10:00 AM", "2:00 PM", "5:00 PM"],
+  "2026-5-19": ["10:00 AM", "4:00 PM"],
+  "2026-5-22": ["10:00 AM", "2:00 PM", "5:00 PM"],
+  "2026-5-25": ["9:00 AM", "2:00 PM", "5:00 PM"],
+  "2026-5-26": ["10:00 AM", "2:00 PM", "6:00 PM"],
+  "2026-5-29": ["11:00 AM", "3:00 PM"],
+  "2026-5-30": ["10:00 AM", "3:00 PM", "6:00 PM"],
+};
+
+function getAvailableTimes(year, month, day) {
+  const key = `${year}-${month + 1}-${day}`;
+  return AVAILABILITY[key] || [];
+}
+
+function isAvailableDay(year, month, day) {
+  const key = `${year}-${month + 1}-${day}`;
+  return !!AVAILABILITY[key];
+}
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -670,8 +710,8 @@ export default function BeautyBooking() {
                     {calDays.map((cell, i) => (
                       <div key={i}
                         className={`cal-day ${cell.current ? "current-month" : ""} ${cell.current && isToday(cell.day) ? "today" : ""} ${selectedDay === cell.day && cell.current ? "selected" : ""}`}
-                        onClick={() => { if (cell.current && !isPast(cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
-                        style={{ opacity: cell.current && isPast(cell.day) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) ? "pointer" : "default" }}
+                        onClick={() => { if (cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
+                        style={{ opacity: cell.current && (isPast(cell.day) || !isAvailableDay(calYear, calMonth, cell.day)) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) ? "pointer" : "default" }}
                       >{cell.day || ""}</div>
                     ))}
                   </div>
@@ -680,7 +720,7 @@ export default function BeautyBooking() {
                   <div className="times-label">{selectedDay ? `${MONTHS[calMonth]} ${selectedDay} — Pick a time` : "Select a date first"}</div>
                   {selectedDay ? (
                     <div className="times-grid">
-                      {TIMES.map(t => (
+                      {getAvailableTimes(calYear, calMonth, selectedDay).map(t => (
                         <div key={t} className={`time-slot ${selectedTime === t ? "selected" : ""}`} onClick={() => setSelectedTime(t)}>{t}</div>
                       ))}
                     </div>
