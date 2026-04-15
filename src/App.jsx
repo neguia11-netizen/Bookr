@@ -1,3 +1,4 @@
+const STRIPE_DEPOSIT_LINK = "https://book.stripe.com/8x29AS728g7V7iAfiI1ck00";
 import { useState } from "react";
 
 const EMAILJS_SERVICE_ID = "service_qj22hlr";
@@ -550,6 +551,7 @@ export default function BeautyBooking() {
     !!selectedService,
     !!selectedDay && !!selectedTime,
     !!(form.first && form.last && form.email && form.phone),
+    true,
   ];
 
   async function handleConfirm() {
@@ -567,7 +569,7 @@ export default function BeautyBooking() {
         client_phone: form.phone,
         notes: form.notes || "None",
       });
-      setSubmitted(true);
+      setStep(4);
     } catch {
       setSendError(true);
     } finally {
@@ -612,7 +614,7 @@ export default function BeautyBooking() {
         </div>
 
         <div className="steps">
-          {["Service","Date & Time","Your Info","Confirm"].map((label, i) => (
+          {["Service","Date & Time","Your Info","Review","Deposit"].map((label, i) => (
             <div key={i} className={`step ${i === step ? "active" : i < step ? "done" : ""}`} onClick={() => i < step && setStep(i)}>
               <div className="step-num">{i < step ? "✓" : i + 1}</div>
               <span>{label}</span>
@@ -741,13 +743,46 @@ export default function BeautyBooking() {
             </>
           )}
 
+
+          {step === 4 && (
+            <>
+              <h2 className="section-title">Pay Your Deposit</h2>
+              <p className="section-sub">$10 deposit required to secure your appointment</p>
+              <div className="summary-card">
+                <div className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{selectedService?.name}</span></div>
+                <div className="summary-row"><span className="summary-key">Date</span><span className="summary-val">{MONTHS[calMonth]} {selectedDay}, {calYear}</span></div>
+                <div className="summary-row"><span className="summary-key">Time</span><span className="summary-val">{selectedTime}</span></div>
+                <div className="summary-total">
+                  <span className="summary-total-label">Deposit Due Now</span>
+                  <span className="summary-total-val">$10.00</span>
+                </div>
+              </div>
+              <div style={{textAlign:"center", padding:"8px 0 16px"}}>
+                <p style={{fontSize:12,color:"var(--muted)",letterSpacing:1,marginBottom:24,lineHeight:1.7}}>
+                  Your booking details have been sent to your email.<br/>
+                  Please complete your $10 deposit below to finalize your appointment.
+                </p>
+                <a href={STRIPE_DEPOSIT_LINK} target="_blank" rel="noopener noreferrer" style={{display:"inline-block"}}>
+                  <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}}>
+                    Pay $10 Deposit ✦
+                  </button>
+                </a>
+                <p style={{fontSize:11,color:"var(--dim)",marginTop:16,letterSpacing:1}}>
+                  Secured by Stripe · Your card info is never stored
+                </p>
+              </div>
+            </>
+          )}
+
           <div className="btn-row">
-            {step > 0
+            {step > 0 && step < 4
               ? <button className="btn btn-ghost" onClick={() => setStep(s => s-1)}>← Back</button>
               : <span />}
             {step < 3
               ? <button className="btn btn-primary" disabled={!canProceed[step]} onClick={() => setStep(s => s+1)}>Continue →</button>
-              : <button className="btn btn-primary" disabled={sending} onClick={handleConfirm}>{sending ? "Booking..." : "Confirm Booking ✦"}</button>}
+              : step === 3
+              ? <button className="btn btn-primary" disabled={sending} onClick={handleConfirm}>{sending ? "Sending..." : "Proceed to Deposit ✦"}</button>
+              : null}
           </div>
         </div>
       </div>
