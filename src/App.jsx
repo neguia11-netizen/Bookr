@@ -625,7 +625,7 @@ export default function BeautyBooking() {
           <div className="header">
             <span className="header-sparkle">✦ ✦ ✦</span>
             <h1><span>Acrylic</span> Faerie</h1>
-            <p className="header-sub">San Antonio · Beauty Studio</p>
+            <p className="header-sub">San Antonio · Home Based Nail Technician</p>
           </div>
           <div className="container">
             <div className="success-wrap">
@@ -649,7 +649,7 @@ export default function BeautyBooking() {
         <div className="header">
           <span className="header-sparkle">✦ ✦ ✦</span>
           <h1><span>Acrylic</span> Faerie</h1>
-          <p className="header-sub">San Antonio · Beauty Studio</p>
+          <p className="header-sub">San Antonio · Home Based Nail Technician</p>
           <div className="header-divider">Book Your Appointment</div>
         </div>
 
