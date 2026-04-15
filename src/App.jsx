@@ -1,5 +1,9 @@
 import { useState } from "react";
 
+const EMAILJS_SERVICE_ID = "service_qj22hlr";
+const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
+const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
+
 const SERVICES = [
   {
     id: 1, category: "Acrylic Sets", icon: "✦",
@@ -81,6 +85,20 @@ function formatDuration(mins) {
   if (h === 0) return `${m} min`;
   if (m === 0) return `${h} hr`;
   return `${h} hr ${m} min`;
+}
+
+async function sendEmail({ service, date, time, duration, price, client_name, client_email, client_phone, notes }) {
+  const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: EMAILJS_TEMPLATE_ID,
+      user_id: EMAILJS_PUBLIC_KEY,
+      template_params: { service, date, time, duration, price, client_name, client_email, client_phone, notes: notes || "None" },
+    }),
+  });
+  if (!res.ok) throw new Error("Email failed");
 }
 
 const styles = `
@@ -166,6 +184,7 @@ const styles = `
   .success-wrap h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 2px; margin-bottom: 12px; }
   .success-wrap p { font-size: 13px; letter-spacing: 1px; color: #7a7068; line-height: 1.8; }
   .success-detail { display: inline-block; margin-top: 36px; padding: 24px 40px; border: 1px solid #2a2a2a; background: #141414; font-size: 12px; letter-spacing: 2px; color: #c9a97a; }
+  .error-msg { margin-top: 16px; font-size: 12px; color: #c97a7a; letter-spacing: 1px; text-align: center; }
 `;
 
 export default function BeautyBooking() {
@@ -178,6 +197,8 @@ export default function BeautyBooking() {
   const [selectedTime, setSelectedTime] = useState(null);
   const [form, setForm] = useState({ first: "", last: "", email: "", phone: "", notes: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState(false);
 
   const categories = [...new Set(SERVICES.map(s => s.category))];
   const daysInMonth = getDaysInMonth(calYear, calMonth);
@@ -195,6 +216,29 @@ export default function BeautyBooking() {
     form.first && form.last && form.email && form.phone,
   ];
 
+  async function handleConfirm() {
+    setSending(true);
+    setSendError(false);
+    try {
+      await sendEmail({
+        service: selectedService.name,
+        date: `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`,
+        time: selectedTime,
+        duration: formatDuration(selectedService.duration),
+        price: selectedService.priceLabel,
+        client_name: `${form.first} ${form.last}`,
+        client_email: form.email,
+        client_phone: form.phone,
+        notes: form.notes,
+      });
+      setSubmitted(true);
+    } catch {
+      setSendError(true);
+    } finally {
+      setSending(false);
+    }
+  }
+
   if (submitted) {
     return (
       <>
@@ -208,7 +252,7 @@ export default function BeautyBooking() {
             <div className="success-wrap">
               <div className="success-icon">✦</div>
               <h2>You're All Set</h2>
-              <p>Your appointment has been booked.<br />A confirmation will be sent to {form.email}.</p>
+              <p>Your appointment has been booked.<br />A confirmation has been sent to {form.email}.</p>
               <div className="success-detail">
                 {selectedService?.name} · {MONTHS[calMonth]} {selectedDay}, {calYear} · {selectedTime}
               </div>
@@ -352,6 +396,7 @@ export default function BeautyBooking() {
                   <span className="summary-total-val">{selectedService?.priceLabel}</span>
                 </div>
               </div>
+              {sendError && <p className="error-msg">Something went wrong sending the confirmation. Please try again.</p>}
             </>
           )}
 
@@ -361,7 +406,7 @@ export default function BeautyBooking() {
               : <span />}
             {step < 3
               ? <button className="btn btn-primary" disabled={!canProceed[step]} onClick={() => setStep(s => s + 1)}>Continue →</button>
-              : <button className="btn btn-primary" onClick={() => setSubmitted(true)}>Confirm Booking</button>}
+              : <button className="btn btn-primary" disabled={sending} onClick={handleConfirm}>{sending ? "Sending..." : "Confirm Booking"}</button>}
           </div>
         </div>
       </div>
