@@ -1,15 +1,72 @@
 import { useState } from "react";
 
 const SERVICES = [
-  { id: 1, category: "Nails", name: "Classic Manicure", duration: 45, price: 35, icon: "✦" },
-  { id: 2, category: "Nails", name: "Gel Manicure", duration: 60, price: 55, icon: "✦" },
-  { id: 3, category: "Nails", name: "Acrylic Full Set", duration: 90, price: 75, icon: "✦" },
-  { id: 4, category: "Nails", name: "Nail Art (per nail)", duration: 15, price: 5, icon: "✦" },
-  { id: 5, category: "Pedicure", name: "Classic Pedicure", duration: 60, price: 45, icon: "◈" },
-  { id: 6, category: "Pedicure", name: "Gel Pedicure", duration: 75, price: 65, icon: "◈" },
-  { id: 7, category: "Lashes", name: "Classic Lash Set", duration: 90, price: 85, icon: "◉" },
-  { id: 8, category: "Lashes", name: "Volume Lash Set", duration: 120, price: 120, icon: "◉" },
-  { id: 9, category: "Lashes", name: "Lash Fill", duration: 60, price: 65, icon: "◉" },
+  {
+    id: 1, category: "Acrylic Sets", icon: "✦",
+    name: "XS-S Acrylic Full Set",
+    description: "Perfect for those who want strength and style without the extra length. Includes detailed cuticle prep, classic acrylic application with tips, finished with a high-shine gel top coat. Prices vary depending on design.",
+    duration: 150, price: null, priceLabel: "Price varies",
+  },
+  {
+    id: 2, category: "Acrylic Sets", icon: "✦",
+    name: "Medium Acrylic Full Set",
+    description: "A chic, elongated aesthetic tailored to your hand shape. Includes detailed cuticle prep, professional acrylic application, and a high-shine gel finish. Prices vary by design.",
+    duration: 165, price: null, priceLabel: "Price varies",
+  },
+  {
+    id: 3, category: "Acrylic Sets", icon: "✦",
+    name: "Long-XL Acrylic Full Set",
+    description: "For the ultimate statement look. Extra length and high impact style with structural integrity and a perfect apex. Detailed cuticle prep and precision shaping included. Prices vary by design.",
+    duration: 180, price: null, priceLabel: "Price varies",
+  },
+  {
+    id: 4, category: "Acrylic Sets", icon: "✦",
+    name: "Acrylic Overlay",
+    description: "Durability of acrylic without the added length. Includes a dry manicure, detailed cuticle prep and a thin acrylic layer applied to the natural nail for added strength. Does not include tips.",
+    duration: 45, price: 35, priceLabel: "$35.00",
+  },
+  {
+    id: 5, category: "Acrylic Sets", icon: "✦",
+    name: "Acrylic Fill",
+    description: "For existing acrylic sets that have grown out (recommended every 2-3 weeks). Includes a structure rebalance and shape refinement. NOTE: If missing more than 3 nails, please book a full set instead.",
+    duration: 150, price: 35, priceLabel: "$35.00 + varies by design",
+  },
+  {
+    id: 6, category: "Acrylic Sets", icon: "✦",
+    name: "Acrylic Soak Off",
+    description: "Professional soak off using professional-grade acetone and careful filing. Includes product removal, nail trimming, shaping, and a hydrating treatment with cuticle oil. No foreign soak offs.",
+    duration: 30, price: 20, priceLabel: "$20.00",
+  },
+  {
+    id: 7, category: "Manicures", icon: "◈",
+    name: "Gel Manicure",
+    description: "Flawless, long-lasting glow with high quality natural nail care. Includes a thorough dry manicure, cuticle detailing, natural nail shaping, and your choice of premium gel polish with a high-shine top coat.",
+    duration: 40, price: 30, priceLabel: "$30.00",
+  },
+  {
+    id: 8, category: "Manicures", icon: "◈",
+    name: "Manicure (No Polish)",
+    description: "Focusing on the health and beauty of your natural nails. Includes detailed cuticle work, nail trimming, shaping, and a soothing buff to a natural shine. Finished with cuticle oil and a hydrating hand massage.",
+    duration: 40, price: 20, priceLabel: "$20.00",
+  },
+  {
+    id: 9, category: "Add-Ons", icon: "◉",
+    name: "Simple Nail Art (Add-On)",
+    description: "Minimalist designs to elevate your set. Ex: Single color french tips, full cat eye set, chrome finish, minimalist dots or lines, basic ombre.",
+    duration: 20, price: 15, priceLabel: "$15.00",
+  },
+  {
+    id: 10, category: "Add-Ons", icon: "◉",
+    name: "Detailed Nail Art (Add-On)",
+    description: "For the girls who want the most! Ex: 3D structural art, hand painted themes, multi-layered designs, charms, etc.",
+    duration: 45, price: 25, priceLabel: "$25.00",
+  },
+  {
+    id: 11, category: "Add-Ons", icon: "◉",
+    name: "Nail Fix (Add-On)",
+    description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.",
+    duration: 10, price: 5, priceLabel: "$5.00 per nail",
+  },
 ];
 
 const TIMES = ["9:00 AM","9:45 AM","10:30 AM","11:15 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM"];
@@ -18,6 +75,13 @@ const MONTHS = ["January","February","March","April","May","June","July","August
 
 function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
 function getFirstDay(year, month) { return new Date(year, month, 1).getDay(); }
+function formatDuration(mins) {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} hr`;
+  return `${h} hr ${m} min`;
+}
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
@@ -40,18 +104,21 @@ const styles = `
   .section-sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #5a534a; margin-bottom: 36px; }
   .category-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #c9a97a; margin: 28px 0 12px; }
   .services-grid { display: grid; gap: 2px; }
-  .service-card { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; background: #141414; border: 1px solid #1e1e1e; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; }
+  .service-card { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px; background: #141414; border: 1px solid #1e1e1e; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; gap: 16px; }
   .service-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #c9a97a; transform: scaleY(0); transition: transform 0.3s; }
   .service-card:hover { background: #191919; }
   .service-card:hover::before { transform: scaleY(1); }
   .service-card.selected { background: #1c1812; border-color: #c9a97a44; }
   .service-card.selected::before { transform: scaleY(1); }
-  .service-left { display: flex; align-items: center; gap: 14px; }
-  .service-icon { color: #c9a97a; font-size: 14px; width: 20px; text-align: center; }
-  .service-name { font-size: 14px; letter-spacing: 1px; }
-  .service-dur { font-size: 11px; color: #5a534a; margin-top: 2px; }
-  .service-price { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #c9a97a; }
-  .check { width: 18px; height: 18px; border-radius: 50%; background: #c9a97a; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #0d0d0d; margin-left: 12px; }
+  .service-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
+  .service-icon { color: #c9a97a; font-size: 14px; width: 20px; text-align: center; padding-top: 2px; flex-shrink: 0; }
+  .service-info { flex: 1; }
+  .service-name { font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
+  .service-desc { font-size: 12px; color: #5a534a; line-height: 1.6; margin-bottom: 8px; }
+  .service-dur { font-size: 11px; color: #4a4540; letter-spacing: 1px; }
+  .service-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .service-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #c9a97a; white-space: nowrap; }
+  .check { width: 18px; height: 18px; border-radius: 50%; background: #c9a97a; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #0d0d0d; }
   .calendar-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
   @media (max-width: 600px) { .calendar-wrap { grid-template-columns: 1fr; } }
   .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
@@ -83,7 +150,7 @@ const styles = `
   .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
   .summary-row:last-child { border-bottom: none; }
   .summary-key { color: #7a7068; letter-spacing: 1px; }
-  .summary-val { color: #f0ebe3; }
+  .summary-val { color: #f0ebe3; text-align: right; max-width: 60%; }
   .summary-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 20px; margin-top: 8px; border-top: 1px solid #2a2a2a; }
   .summary-total-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #5a534a; }
   .summary-total-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #c9a97a; }
@@ -182,13 +249,14 @@ export default function BeautyBooking() {
                       <div key={s.id} className={`service-card ${selectedService?.id === s.id ? "selected" : ""}`} onClick={() => setSelectedService(s)}>
                         <div className="service-left">
                           <div className="service-icon">{s.icon}</div>
-                          <div>
+                          <div className="service-info">
                             <div className="service-name">{s.name}</div>
-                            <div className="service-dur">{s.duration} min</div>
+                            <div className="service-desc">{s.description}</div>
+                            <div className="service-dur">{formatDuration(s.duration)}</div>
                           </div>
                         </div>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          <div className="service-price">${s.price}</div>
+                        <div className="service-right">
+                          <div className="service-price">{s.priceLabel}</div>
                           {selectedService?.id === s.id && <div className="check">✓</div>}
                         </div>
                       </div>
@@ -202,7 +270,7 @@ export default function BeautyBooking() {
           {step === 1 && (
             <>
               <h2 className="section-title">Pick a Date & Time</h2>
-              <p className="section-sub">{selectedService?.name} · {selectedService?.duration} min</p>
+              <p className="section-sub">{selectedService?.name} · {formatDuration(selectedService?.duration)}</p>
               <div className="calendar-wrap">
                 <div>
                   <div className="cal-header">
@@ -272,7 +340,7 @@ export default function BeautyBooking() {
               <p className="section-sub">Please review your booking details</p>
               <div className="summary-card">
                 <div className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{selectedService?.name}</span></div>
-                <div className="summary-row"><span className="summary-key">Duration</span><span className="summary-val">{selectedService?.duration} min</span></div>
+                <div className="summary-row"><span className="summary-key">Duration</span><span className="summary-val">{formatDuration(selectedService?.duration)}</span></div>
                 <div className="summary-row"><span className="summary-key">Date</span><span className="summary-val">{MONTHS[calMonth]} {selectedDay}, {calYear}</span></div>
                 <div className="summary-row"><span className="summary-key">Time</span><span className="summary-val">{selectedTime}</span></div>
                 <div className="summary-row"><span className="summary-key">Name</span><span className="summary-val">{form.first} {form.last}</span></div>
@@ -280,8 +348,8 @@ export default function BeautyBooking() {
                 <div className="summary-row"><span className="summary-key">Phone</span><span className="summary-val">{form.phone}</span></div>
                 {form.notes && <div className="summary-row"><span className="summary-key">Notes</span><span className="summary-val">{form.notes}</span></div>}
                 <div className="summary-total">
-                  <span className="summary-total-label">Total</span>
-                  <span className="summary-total-val">${selectedService?.price}</span>
+                  <span className="summary-total-label">Estimated Total</span>
+                  <span className="summary-total-val">{selectedService?.priceLabel}</span>
                 </div>
               </div>
             </>
