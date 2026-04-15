@@ -1,7 +1,8 @@
 import { useState } from "react";
 
 const EMAILJS_SERVICE_ID = "service_qj22hlr";
-const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
+const EMAILJS_TEMPLATE_ID = "template_pp8uavo";       // sends to you
+const EMAILJS_CLIENT_TEMPLATE_ID = "template_0az8fc7"; // sends to client
 const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
 
 const SERVICES = [
@@ -31,18 +32,23 @@ function formatDuration(mins) {
   return `${h} hr ${m} min`;
 }
 
-async function sendEmail(params) {
+async function sendEmailToTemplate(templateId, params) {
   const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       service_id: EMAILJS_SERVICE_ID,
-      template_id: EMAILJS_TEMPLATE_ID,
+      template_id: templateId,
       user_id: EMAILJS_PUBLIC_KEY,
       template_params: params,
     }),
   });
   if (!res.ok) throw new Error("Email failed");
+}
+
+async function sendEmail(params) {
+  await sendEmailToTemplate(EMAILJS_TEMPLATE_ID, params);
+  await sendEmailToTemplate(EMAILJS_CLIENT_TEMPLATE_ID, params);
 }
 
 const styles = `
