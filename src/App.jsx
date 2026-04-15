@@ -5,89 +5,33 @@ const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
 const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
 
 const SERVICES = [
-  {
-    id: 1, category: "Acrylic Sets", icon: "✦",
-    name: "XS-S Acrylic Full Set",
-    description: "Perfect for those who want strength and style without the extra length. Includes detailed cuticle prep, classic acrylic application with tips, finished with a high-shine gel top coat. Prices vary depending on design.",
-    duration: 150, price: null, priceLabel: "Price varies",
-  },
-  {
-    id: 2, category: "Acrylic Sets", icon: "✦",
-    name: "Medium Acrylic Full Set",
-    description: "A chic, elongated aesthetic tailored to your hand shape. Includes detailed cuticle prep, professional acrylic application, and a high-shine gel finish. Prices vary by design.",
-    duration: 165, price: null, priceLabel: "Price varies",
-  },
-  {
-    id: 3, category: "Acrylic Sets", icon: "✦",
-    name: "Long-XL Acrylic Full Set",
-    description: "For the ultimate statement look. Extra length and high impact style with structural integrity and a perfect apex. Detailed cuticle prep and precision shaping included. Prices vary by design.",
-    duration: 180, price: null, priceLabel: "Price varies",
-  },
-  {
-    id: 4, category: "Acrylic Sets", icon: "✦",
-    name: "Acrylic Overlay",
-    description: "Durability of acrylic without the added length. Includes a dry manicure, detailed cuticle prep and a thin acrylic layer applied to the natural nail for added strength. Does not include tips.",
-    duration: 45, price: 35, priceLabel: "$35.00",
-  },
-  {
-    id: 5, category: "Acrylic Sets", icon: "✦",
-    name: "Acrylic Fill",
-    description: "For existing acrylic sets that have grown out (recommended every 2-3 weeks). Includes a structure rebalance and shape refinement. NOTE: If missing more than 3 nails, please book a full set instead.",
-    duration: 150, price: 35, priceLabel: "$35.00 + varies by design",
-  },
-  {
-    id: 6, category: "Acrylic Sets", icon: "✦",
-    name: "Acrylic Soak Off",
-    description: "Professional soak off using professional-grade acetone and careful filing. Includes product removal, nail trimming, shaping, and a hydrating treatment with cuticle oil. No foreign soak offs.",
-    duration: 30, price: 20, priceLabel: "$20.00",
-  },
-  {
-    id: 7, category: "Manicures", icon: "◈",
-    name: "Gel Manicure",
-    description: "Flawless, long-lasting glow with high quality natural nail care. Includes a thorough dry manicure, cuticle detailing, natural nail shaping, and your choice of premium gel polish with a high-shine top coat.",
-    duration: 40, price: 30, priceLabel: "$30.00",
-  },
-  {
-    id: 8, category: "Manicures", icon: "◈",
-    name: "Manicure (No Polish)",
-    description: "Focusing on the health and beauty of your natural nails. Includes detailed cuticle work, nail trimming, shaping, and a soothing buff to a natural shine. Finished with cuticle oil and a hydrating hand massage.",
-    duration: 40, price: 20, priceLabel: "$20.00",
-  },
-  {
-    id: 9, category: "Add-Ons", icon: "◉",
-    name: "Simple Nail Art (Add-On)",
-    description: "Minimalist designs to elevate your set. Ex: Single color french tips, full cat eye set, chrome finish, minimalist dots or lines, basic ombre.",
-    duration: 20, price: 15, priceLabel: "$15.00",
-  },
-  {
-    id: 10, category: "Add-Ons", icon: "◉",
-    name: "Detailed Nail Art (Add-On)",
-    description: "For the girls who want the most! Ex: 3D structural art, hand painted themes, multi-layered designs, charms, etc.",
-    duration: 45, price: 25, priceLabel: "$25.00",
-  },
-  {
-    id: 11, category: "Add-Ons", icon: "◉",
-    name: "Nail Fix (Add-On)",
-    description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.",
-    duration: 10, price: 5, priceLabel: "$5.00 per nail",
-  },
+  { id: 1, category: "Acrylic Sets", icon: "✦", name: "XS-S Acrylic Full Set", description: "Perfect for those who want strength and style without the extra length. Includes detailed cuticle prep, classic acrylic application with tips, finished with a high-shine gel top coat. Prices vary depending on design.", duration: 150, priceLabel: "Price varies" },
+  { id: 2, category: "Acrylic Sets", icon: "✦", name: "Medium Acrylic Full Set", description: "A chic, elongated aesthetic tailored to your hand shape. Includes detailed cuticle prep, professional acrylic application, and a high-shine gel finish. Prices vary by design.", duration: 165, priceLabel: "Price varies" },
+  { id: 3, category: "Acrylic Sets", icon: "✦", name: "Long-XL Acrylic Full Set", description: "For the ultimate statement look. Extra length and high impact style with structural integrity and a perfect apex. Detailed cuticle prep and precision shaping included. Prices vary by design.", duration: 180, priceLabel: "Price varies" },
+  { id: 4, category: "Acrylic Sets", icon: "✦", name: "Acrylic Overlay", description: "Durability of acrylic without the added length. Includes a dry manicure, detailed cuticle prep and a thin acrylic layer applied to the natural nail for added strength. Does not include tips.", duration: 45, priceLabel: "$35.00" },
+  { id: 5, category: "Acrylic Sets", icon: "✦", name: "Acrylic Fill", description: "For existing acrylic sets that have grown out (recommended every 2-3 weeks). Includes a structure rebalance and shape refinement. NOTE: If missing more than 3 nails, please book a full set instead.", duration: 150, priceLabel: "$35.00 + varies by design" },
+  { id: 6, category: "Acrylic Sets", icon: "✦", name: "Acrylic Soak Off", description: "Professional soak off using professional-grade acetone and careful filing. Includes product removal, nail trimming, shaping, and a hydrating treatment with cuticle oil. No foreign soak offs.", duration: 30, priceLabel: "$20.00" },
+  { id: 7, category: "Manicures", icon: "◈", name: "Gel Manicure", description: "Flawless, long-lasting glow with high quality natural nail care. Includes a thorough dry manicure, cuticle detailing, natural nail shaping, and your choice of premium gel polish with a high-shine top coat.", duration: 40, priceLabel: "$30.00" },
+  { id: 8, category: "Manicures", icon: "◈", name: "Manicure (No Polish)", description: "Focusing on the health and beauty of your natural nails. Includes detailed cuticle work, nail trimming, shaping, and a soothing buff to a natural shine. Finished with cuticle oil and a hydrating hand massage.", duration: 40, priceLabel: "$20.00" },
+  { id: 9, category: "Add-Ons", icon: "✿", name: "Simple Nail Art (Add-On)", description: "Minimalist designs to elevate your set. Ex: Single color french tips, full cat eye set, chrome finish, minimalist dots or lines, basic ombre.", duration: 20, priceLabel: "$15.00" },
+  { id: 10, category: "Add-Ons", icon: "✿", name: "Detailed Nail Art (Add-On)", description: "For the girls who want the most! Ex: 3D structural art, hand painted themes, multi-layered designs, charms, etc.", duration: 45, priceLabel: "$25.00" },
+  { id: 11, category: "Add-Ons", icon: "✿", name: "Nail Fix (Add-On)", description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.", duration: 10, priceLabel: "$5.00 per nail" },
 ];
 
 const TIMES = ["9:00 AM","9:45 AM","10:30 AM","11:15 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM"];
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
-function getDaysInMonth(year, month) { return new Date(year, month + 1, 0).getDate(); }
-function getFirstDay(year, month) { return new Date(year, month, 1).getDay(); }
+function getDaysInMonth(y, m) { return new Date(y, m + 1, 0).getDate(); }
+function getFirstDay(y, m) { return new Date(y, m, 1).getDay(); }
 function formatDuration(mins) {
-  const h = Math.floor(mins / 60);
-  const m = mins % 60;
-  if (h === 0) return `${m} min`;
-  if (m === 0) return `${h} hr`;
+  const h = Math.floor(mins / 60), m = mins % 60;
+  if (!h) return `${m} min`;
+  if (!m) return `${h} hr`;
   return `${h} hr ${m} min`;
 }
 
-async function sendEmail({ service, date, time, duration, price, client_name, client_email, client_phone, notes }) {
+async function sendEmail(params) {
   const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -95,96 +39,482 @@ async function sendEmail({ service, date, time, duration, price, client_name, cl
       service_id: EMAILJS_SERVICE_ID,
       template_id: EMAILJS_TEMPLATE_ID,
       user_id: EMAILJS_PUBLIC_KEY,
-      template_params: { service, date, time, duration, price, client_name, client_email, client_phone, notes: notes || "None" },
+      template_params: params,
     }),
   });
   if (!res.ok) throw new Error("Email failed");
 }
 
 const styles = `
-  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg:        #0f0a0c;
+    --bg2:       #1a1015;
+    --bg3:       #221520;
+    --border:    #3a1f2e;
+    --border2:   #4d2a3d;
+    --rose:      #c4415a;
+    --rose-lt:   #e8839a;
+    --rose-dim:  #7a2840;
+    --pink:      #f0b8c8;
+    --text:      #f5e8ee;
+    --muted:     #9a7080;
+    --dim:       #5a3a48;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0d0d0d; }
-  .app { min-height: 100vh; background: #0d0d0d; color: #f0ebe3; font-family: 'Jost', sans-serif; font-weight: 300; }
-  .header { text-align: center; padding: 52px 24px 36px; border-bottom: 1px solid #2a2a2a; }
-  .header::before { content: '— ✦ —'; display: block; font-size: 11px; letter-spacing: 6px; color: #c9a97a; margin-bottom: 16px; }
-  .header h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(36px, 7vw, 58px); font-weight: 300; letter-spacing: 4px; color: #f0ebe3; line-height: 1.1; }
-  .header h1 em { font-style: italic; color: #c9a97a; }
-  .header p { margin-top: 10px; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: #7a7068; }
-  .steps { display: flex; justify-content: center; padding: 28px 24px; border-bottom: 1px solid #1e1e1e; flex-wrap: wrap; gap: 8px; }
-  .step { display: flex; align-items: center; gap: 10px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #4a4540; cursor: pointer; transition: color 0.3s; padding: 0 16px; }
-  .step:not(:last-child)::after { content: ''; display: inline-block; width: 24px; height: 1px; background: #2a2a2a; margin-left: 16px; }
-  .step.active { color: #c9a97a; }
-  .step.done { color: #7a7068; }
-  .step-num { width: 22px; height: 22px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; }
-  .container { max-width: 860px; margin: 0 auto; padding: 48px 24px; }
-  .section-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 300; letter-spacing: 2px; color: #f0ebe3; margin-bottom: 8px; }
-  .section-sub { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #5a534a; margin-bottom: 36px; }
-  .category-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #c9a97a; margin: 28px 0 12px; }
-  .services-grid { display: grid; gap: 2px; }
-  .service-card { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px; background: #141414; border: 1px solid #1e1e1e; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; gap: 16px; }
-  .service-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background: #c9a97a; transform: scaleY(0); transition: transform 0.3s; }
-  .service-card:hover { background: #191919; }
-  .service-card:hover::before { transform: scaleY(1); }
-  .service-card.selected { background: #1c1812; border-color: #c9a97a44; }
-  .service-card.selected::before { transform: scaleY(1); }
+  body { background: var(--bg); }
+
+  .app {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Leopard print background pattern */
+  .app::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(ellipse 18px 12px at 8% 12%, #2a0f1a55 0%, transparent 70%),
+      radial-gradient(ellipse 10px 16px at 18% 8%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 14px 9px at 30% 18%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 20px 13px at 45% 6%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 12px 18px at 60% 15%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 16px 10px at 75% 9%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 11px 15px at 88% 18%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 15px 11px at 95% 8%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 13px 17px at 5% 35%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 19px 11px at 22% 40%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 10px 14px at 38% 32%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 17px 12px at 55% 38%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 12px 16px at 70% 30%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 15px 10px at 85% 42%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 11px 13px at 12% 58%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 18px 12px at 28% 62%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 13px 17px at 48% 55%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 16px 11px at 65% 65%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 12px 15px at 80% 58%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 14px 10px at 93% 62%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 17px 13px at 8% 80%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 11px 16px at 25% 85%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 15px 10px at 42% 78%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 19px 13px at 58% 88%, #2a0f1a33 0%, transparent 70%),
+      radial-gradient(ellipse 12px 17px at 75% 82%, #2a0f1a44 0%, transparent 70%),
+      radial-gradient(ellipse 16px 11px at 90% 90%, #2a0f1a44 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.7;
+  }
+
+  .app > * { position: relative; z-index: 1; }
+
+  /* HEADER */
+  .header {
+    text-align: center;
+    padding: 48px 24px 36px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, #1e0d16 0%, transparent 100%);
+    position: relative;
+  }
+  .header-sparkle {
+    font-size: 13px;
+    letter-spacing: 8px;
+    color: var(--rose);
+    margin-bottom: 18px;
+    display: block;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(40px, 8vw, 68px);
+    font-weight: 700;
+    font-style: italic;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1;
+    text-shadow: 0 0 60px #c4415a55;
+  }
+  .header h1 span { color: var(--rose-lt); }
+  .header-sub {
+    margin-top: 12px;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .header-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+    color: var(--rose-dim);
+    font-size: 11px;
+    letter-spacing: 3px;
+  }
+  .header-divider::before, .header-divider::after {
+    content: '';
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rose-dim));
+  }
+  .header-divider::after { transform: scaleX(-1); }
+
+  /* STEPS */
+  .steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg2);
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+    cursor: pointer;
+    transition: color 0.3s;
+    padding: 6px 14px;
+  }
+  .step:not(:last-child)::after {
+    content: '›';
+    margin-left: 14px;
+    color: var(--border2);
+    font-size: 14px;
+  }
+  .step.active { color: var(--rose-lt); }
+  .step.done { color: var(--muted); cursor: pointer; }
+  .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 9px; flex-shrink: 0;
+  }
+  .step.active .step-num {
+    background: var(--rose);
+    border-color: var(--rose);
+    color: white;
+  }
+
+  /* CONTAINER */
+  .container { max-width: 880px; margin: 0 auto; padding: 44px 24px; }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 30px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .section-sub {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 32px;
+  }
+
+  /* CATEGORY */
+  .category-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--rose);
+    margin: 32px 0 10px;
+  }
+  .category-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--rose-dim), transparent);
+  }
+
+  /* SERVICE CARDS */
+  .services-grid { display: grid; gap: 3px; }
+  .service-card {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 18px 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    gap: 16px;
+  }
+  .service-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #c4415a08 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .service-card:hover { border-color: var(--border2); background: var(--bg3); }
+  .service-card:hover::after { opacity: 1; }
+  .service-card.selected {
+    background: #200e18;
+    border-color: var(--rose-dim);
+    box-shadow: inset 3px 0 0 var(--rose), 0 0 20px #c4415a18;
+  }
+  .service-card.selected::after { opacity: 1; }
   .service-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
-  .service-icon { color: #c9a97a; font-size: 14px; width: 20px; text-align: center; padding-top: 2px; flex-shrink: 0; }
+  .service-icon { color: var(--rose); font-size: 13px; width: 18px; text-align: center; padding-top: 3px; flex-shrink: 0; }
   .service-info { flex: 1; }
-  .service-name { font-size: 14px; letter-spacing: 1px; margin-bottom: 6px; }
-  .service-desc { font-size: 12px; color: #5a534a; line-height: 1.6; margin-bottom: 8px; }
-  .service-dur { font-size: 11px; color: #4a4540; letter-spacing: 1px; }
-  .service-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-  .service-price { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: #c9a97a; white-space: nowrap; }
-  .check { width: 18px; height: 18px; border-radius: 50%; background: #c9a97a; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #0d0d0d; }
-  .calendar-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+  .service-name { font-size: 14px; font-weight: 400; color: var(--text); margin-bottom: 6px; letter-spacing: 0.3px; }
+  .service-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
+  .service-dur {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+  .service-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
+  .service-price {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--rose-lt);
+    white-space: nowrap;
+  }
+  .check {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--rose);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: white;
+    box-shadow: 0 0 12px #c4415a66;
+  }
+
+  /* CALENDAR */
+  .calendar-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
   @media (max-width: 600px) { .calendar-wrap { grid-template-columns: 1fr; } }
-  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .cal-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; letter-spacing: 1px; }
-  .cal-nav { background: none; border: 1px solid #2a2a2a; color: #f0ebe3; width: 28px; height: 28px; cursor: pointer; font-size: 14px; transition: border-color 0.2s; }
-  .cal-nav:hover { border-color: #c9a97a; color: #c9a97a; }
+
+  .cal-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+  .cal-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--text);
+  }
+  .cal-nav {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cal-nav:hover { border-color: var(--rose); color: var(--rose-lt); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-day-name { text-align: center; font-size: 9px; letter-spacing: 2px; color: #4a4540; text-transform: uppercase; padding: 4px 0 10px; }
-  .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; border: 1px solid transparent; transition: all 0.15s; color: #7a7068; }
-  .cal-day.current-month { color: #f0ebe3; }
-  .cal-day.today { border-color: #3a3530; }
-  .cal-day:hover.current-month { background: #1e1e1e; }
-  .cal-day.selected { background: #c9a97a; color: #0d0d0d; border-color: #c9a97a; }
-  .times-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #5a534a; margin-bottom: 14px; }
+  .cal-day-name {
+    text-align: center;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--dim);
+    text-transform: uppercase;
+    padding: 4px 0 10px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    color: var(--dim);
+  }
+  .cal-day.current-month { color: var(--text); cursor: pointer; }
+  .cal-day.current-month:hover { background: var(--bg3); border-color: var(--border2); }
+  .cal-day.today { border-color: var(--rose-dim); }
+  .cal-day.selected { background: var(--rose); color: white; border-color: var(--rose); box-shadow: 0 0 14px #c4415a55; }
+
+  .times-box {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+  .times-label {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--dim);
+    margin-bottom: 14px;
+  }
   .times-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .time-slot { padding: 10px; border: 1px solid #1e1e1e; background: #141414; font-size: 12px; letter-spacing: 1px; text-align: center; cursor: pointer; transition: all 0.15s; color: #a09888; }
-  .time-slot:hover { border-color: #3a3530; color: #f0ebe3; }
-  .time-slot.selected { border-color: #c9a97a; background: #1c1812; color: #c9a97a; }
+  .time-slot {
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    color: var(--muted);
+    border-radius: 2px;
+  }
+  .time-slot:hover { border-color: var(--border2); color: var(--text); }
+  .time-slot.selected {
+    border-color: var(--rose);
+    background: #200e18;
+    color: var(--rose-lt);
+    box-shadow: 0 0 10px #c4415a22;
+  }
+
+  /* FORM */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
   .form-field { display: flex; flex-direction: column; gap: 8px; }
   .form-field.full { grid-column: 1 / -1; }
-  .form-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #5a534a; }
-  .form-input { background: #141414; border: 1px solid #1e1e1e; color: #f0ebe3; font-family: 'Jost', sans-serif; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; font-weight: 300; }
-  .form-input:focus { border-color: #c9a97a55; }
-  .form-input::placeholder { color: #3a3530; }
+  .form-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .form-input {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-weight: 300;
+    border-radius: 2px;
+  }
+  .form-input:focus { border-color: var(--rose-dim); box-shadow: 0 0 0 3px #c4415a18; }
+  .form-input::placeholder { color: var(--dim); }
   textarea.form-input { resize: vertical; min-height: 90px; }
-  .summary-card { background: #141414; border: 1px solid #1e1e1e; padding: 28px; margin-bottom: 28px; }
-  .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid #1a1a1a; font-size: 13px; }
+
+  /* SUMMARY */
+  .summary-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 28px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim));
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    gap: 16px;
+  }
   .summary-row:last-child { border-bottom: none; }
-  .summary-key { color: #7a7068; letter-spacing: 1px; }
-  .summary-val { color: #f0ebe3; text-align: right; max-width: 60%; }
-  .summary-total { display: flex; justify-content: space-between; align-items: baseline; padding-top: 20px; margin-top: 8px; border-top: 1px solid #2a2a2a; }
-  .summary-total-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #5a534a; }
-  .summary-total-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; color: #c9a97a; }
-  .btn-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 40px; }
-  .btn { padding: 14px 36px; font-family: 'Jost', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 400; border: none; }
-  .btn-primary { background: #c9a97a; color: #0d0d0d; }
-  .btn-primary:hover { background: #d4b98a; }
-  .btn-primary:disabled { background: #3a3530; color: #5a534a; cursor: not-allowed; }
-  .btn-ghost { background: none; border: 1px solid #2a2a2a; color: #7a7068; }
-  .btn-ghost:hover { border-color: #5a534a; color: #f0ebe3; }
-  .success-wrap { text-align: center; padding: 60px 24px; }
-  .success-icon { font-size: 40px; margin-bottom: 24px; color: #c9a97a; }
-  .success-wrap h2 { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 300; letter-spacing: 2px; margin-bottom: 12px; }
-  .success-wrap p { font-size: 13px; letter-spacing: 1px; color: #7a7068; line-height: 1.8; }
-  .success-detail { display: inline-block; margin-top: 36px; padding: 24px 40px; border: 1px solid #2a2a2a; background: #141414; font-size: 12px; letter-spacing: 2px; color: #c9a97a; }
-  .error-msg { margin-top: 16px; font-size: 12px; color: #c97a7a; letter-spacing: 1px; text-align: center; }
+  .summary-key { color: var(--muted); letter-spacing: 1px; font-size: 11px; text-transform: uppercase; flex-shrink: 0; }
+  .summary-val { color: var(--text); text-align: right; }
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 20px;
+    margin-top: 12px;
+    border-top: 1px solid var(--border2);
+  }
+  .summary-total-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .summary-total-val { font-family: 'Playfair Display', serif; font-size: 26px; font-style: italic; color: var(--rose-lt); }
+
+  /* BUTTONS */
+  .btn-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 36px; }
+  .btn {
+    padding: 14px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    border: none;
+    border-radius: 2px;
+  }
+  .btn-primary {
+    background: var(--rose);
+    color: white;
+    box-shadow: 0 4px 20px #c4415a44;
+  }
+  .btn-primary:hover { background: #d4506a; box-shadow: 0 4px 28px #c4415a66; transform: translateY(-1px); }
+  .btn-primary:disabled { background: var(--border2); color: var(--dim); cursor: not-allowed; box-shadow: none; transform: none; }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border2);
+    color: var(--muted);
+  }
+  .btn-ghost:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
+
+  /* SUCCESS */
+  .success-wrap { text-align: center; padding: 72px 24px; }
+  .success-icon {
+    font-size: 48px;
+    color: var(--rose);
+    margin-bottom: 28px;
+    display: block;
+    text-shadow: 0 0 40px #c4415a88;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.05)} }
+  .success-wrap h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 40px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 14px;
+  }
+  .success-wrap p { font-size: 14px; color: var(--muted); line-height: 1.8; letter-spacing: 0.3px; }
+  .success-detail {
+    display: inline-block;
+    margin-top: 36px;
+    padding: 20px 40px;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--rose-lt);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+  }
+  .error-msg { margin-top: 14px; font-size: 12px; color: #e87a7a; letter-spacing: 1px; text-align: center; }
+
+  .no-date-msg { font-size: 12px; color: var(--dim); letter-spacing: 1px; margin-top: 10px; }
 `;
 
 export default function BeautyBooking() {
@@ -213,7 +543,7 @@ export default function BeautyBooking() {
   const canProceed = [
     !!selectedService,
     !!selectedDay && !!selectedTime,
-    form.first && form.last && form.email && form.phone,
+    !!(form.first && form.last && form.email && form.phone),
   ];
 
   async function handleConfirm() {
@@ -229,7 +559,7 @@ export default function BeautyBooking() {
         client_name: `${form.first} ${form.last}`,
         client_email: form.email,
         client_phone: form.phone,
-        notes: form.notes,
+        notes: form.notes || "None",
       });
       setSubmitted(true);
     } catch {
@@ -245,13 +575,14 @@ export default function BeautyBooking() {
         <style>{styles}</style>
         <div className="app">
           <div className="header">
-            <h1>Acrylic <em>Faerie</em></h1>
-            <p>San Antonio · Beauty Studio</p>
+            <span className="header-sparkle">✦ ✦ ✦</span>
+            <h1><span>Acrylic</span> Faerie</h1>
+            <p className="header-sub">San Antonio · Beauty Studio</p>
           </div>
           <div className="container">
             <div className="success-wrap">
-              <div className="success-icon">✦</div>
-              <h2>You're All Set</h2>
+              <span className="success-icon">✦</span>
+              <h2>You're All Set!</h2>
               <p>Your appointment has been booked.<br />A confirmation has been sent to {form.email}.</p>
               <div className="success-detail">
                 {selectedService?.name} · {MONTHS[calMonth]} {selectedDay}, {calYear} · {selectedTime}
@@ -268,9 +599,12 @@ export default function BeautyBooking() {
       <style>{styles}</style>
       <div className="app">
         <div className="header">
-          <h1>Acrylic <em>Faerie</em></h1>
-          <p>San Antonio · Beauty Studio</p>
+          <span className="header-sparkle">✦ ✦ ✦</span>
+          <h1><span>Acrylic</span> Faerie</h1>
+          <p className="header-sub">San Antonio · Beauty Studio</p>
+          <div className="header-divider">Book Your Appointment</div>
         </div>
+
         <div className="steps">
           {["Service","Date & Time","Your Info","Confirm"].map((label, i) => (
             <div key={i} className={`step ${i === step ? "active" : i < step ? "done" : ""}`} onClick={() => i < step && setStep(i)}>
@@ -279,6 +613,7 @@ export default function BeautyBooking() {
             </div>
           ))}
         </div>
+
         <div className="container">
 
           {step === 0 && (
@@ -296,7 +631,7 @@ export default function BeautyBooking() {
                           <div className="service-info">
                             <div className="service-name">{s.name}</div>
                             <div className="service-desc">{s.description}</div>
-                            <div className="service-dur">{formatDuration(s.duration)}</div>
+                            <div className="service-dur">⏱ {formatDuration(s.duration)}</div>
                           </div>
                         </div>
                         <div className="service-right">
@@ -316,11 +651,11 @@ export default function BeautyBooking() {
               <h2 className="section-title">Pick a Date & Time</h2>
               <p className="section-sub">{selectedService?.name} · {formatDuration(selectedService?.duration)}</p>
               <div className="calendar-wrap">
-                <div>
+                <div className="cal-box">
                   <div className="cal-header">
-                    <button className="cal-nav" onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y - 1); } else setCalMonth(m => m - 1); }}>‹</button>
+                    <button className="cal-nav" onClick={() => { if (calMonth === 0) { setCalMonth(11); setCalYear(y => y-1); } else setCalMonth(m => m-1); }}>‹</button>
                     <h3>{MONTHS[calMonth]} {calYear}</h3>
-                    <button className="cal-nav" onClick={() => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y + 1); } else setCalMonth(m => m + 1); }}>›</button>
+                    <button className="cal-nav" onClick={() => { if (calMonth === 11) { setCalMonth(0); setCalYear(y => y+1); } else setCalMonth(m => m+1); }}>›</button>
                   </div>
                   <div className="cal-grid">
                     {DAYS.map(d => <div key={d} className="cal-day-name">{d}</div>)}
@@ -333,8 +668,8 @@ export default function BeautyBooking() {
                     ))}
                   </div>
                 </div>
-                <div>
-                  <div className="times-label">Available Times {selectedDay ? `— ${MONTHS[calMonth]} ${selectedDay}` : ""}</div>
+                <div className="times-box">
+                  <div className="times-label">{selectedDay ? `${MONTHS[calMonth]} ${selectedDay} — Pick a time` : "Select a date first"}</div>
                   {selectedDay ? (
                     <div className="times-grid">
                       {TIMES.map(t => (
@@ -342,7 +677,7 @@ export default function BeautyBooking() {
                       ))}
                     </div>
                   ) : (
-                    <p style={{ fontSize: 12, color: "#4a4540", letterSpacing: 1, marginTop: 8 }}>Select a date first</p>
+                    <p className="no-date-msg">← Choose a date on the calendar</p>
                   )}
                 </div>
               </div>
@@ -356,23 +691,23 @@ export default function BeautyBooking() {
               <div className="form-grid">
                 <div className="form-field">
                   <label className="form-label">First Name</label>
-                  <input className="form-input" placeholder="Jane" value={form.first} onChange={e => setForm({ ...form, first: e.target.value })} />
+                  <input className="form-input" placeholder="Jane" value={form.first} onChange={e => setForm({...form, first: e.target.value})} />
                 </div>
                 <div className="form-field">
                   <label className="form-label">Last Name</label>
-                  <input className="form-input" placeholder="Doe" value={form.last} onChange={e => setForm({ ...form, last: e.target.value })} />
+                  <input className="form-input" placeholder="Doe" value={form.last} onChange={e => setForm({...form, last: e.target.value})} />
                 </div>
                 <div className="form-field">
                   <label className="form-label">Email Address</label>
-                  <input className="form-input" type="email" placeholder="jane@email.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
+                  <input className="form-input" type="email" placeholder="jane@email.com" value={form.email} onChange={e => setForm({...form, email: e.target.value})} />
                 </div>
                 <div className="form-field">
                   <label className="form-label">Phone Number</label>
-                  <input className="form-input" type="tel" placeholder="(210) 555-0000" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
+                  <input className="form-input" type="tel" placeholder="(210) 555-0000" value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} />
                 </div>
                 <div className="form-field full">
                   <label className="form-label">Notes (optional)</label>
-                  <textarea className="form-input" placeholder="Any special requests or allergies..." value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} />
+                  <textarea className="form-input" placeholder="Any special requests, inspo pics, or allergies..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
                 </div>
               </div>
             </>
@@ -381,7 +716,7 @@ export default function BeautyBooking() {
           {step === 3 && (
             <>
               <h2 className="section-title">Review & Confirm</h2>
-              <p className="section-sub">Please review your booking details</p>
+              <p className="section-sub">Please review your booking details below</p>
               <div className="summary-card">
                 <div className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{selectedService?.name}</span></div>
                 <div className="summary-row"><span className="summary-key">Duration</span><span className="summary-val">{formatDuration(selectedService?.duration)}</span></div>
@@ -396,17 +731,17 @@ export default function BeautyBooking() {
                   <span className="summary-total-val">{selectedService?.priceLabel}</span>
                 </div>
               </div>
-              {sendError && <p className="error-msg">Something went wrong sending the confirmation. Please try again.</p>}
+              {sendError && <p className="error-msg">Something went wrong. Please try again.</p>}
             </>
           )}
 
           <div className="btn-row">
             {step > 0
-              ? <button className="btn btn-ghost" onClick={() => setStep(s => s - 1)}>← Back</button>
+              ? <button className="btn btn-ghost" onClick={() => setStep(s => s-1)}>← Back</button>
               : <span />}
             {step < 3
-              ? <button className="btn btn-primary" disabled={!canProceed[step]} onClick={() => setStep(s => s + 1)}>Continue →</button>
-              : <button className="btn btn-primary" disabled={sending} onClick={handleConfirm}>{sending ? "Sending..." : "Confirm Booking"}</button>}
+              ? <button className="btn btn-primary" disabled={!canProceed[step]} onClick={() => setStep(s => s+1)}>Continue →</button>
+              : <button className="btn btn-primary" disabled={sending} onClick={handleConfirm}>{sending ? "Booking..." : "Confirm Booking ✦"}</button>}
           </div>
         </div>
       </div>
