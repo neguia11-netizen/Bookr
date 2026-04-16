@@ -589,6 +589,69 @@ const styles = `
     font-style: italic;
   }
   .error-msg { margin-top: 14px; font-size: 12px; color: #e87a7a; letter-spacing: 1px; text-align: center; }
+  /* POLICY MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(15, 10, 12, 0.92);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    max-width: 560px; width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    position: relative;
+    animation: fadeUp 0.3s ease;
+  }
+  .modal::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim));
+  }
+  .modal-header {
+    padding: 28px 28px 16px;
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0;
+    background: var(--bg2);
+    z-index: 1;
+  }
+  .modal-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px; font-style: italic; font-weight: 400;
+    color: var(--text); margin-bottom: 4px;
+  }
+  .modal-header p { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
+  .modal-body { padding: 20px 28px 28px; }
+  .policy-section { margin-bottom: 24px; }
+  .policy-section:last-child { margin-bottom: 0; }
+  .policy-section h3 {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--rose); margin-bottom: 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .policy-section h3::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .policy-item {
+    display: flex; gap: 10px; margin-bottom: 8px;
+    font-size: 13px; color: var(--muted); line-height: 1.65;
+  }
+  .policy-item:last-child { margin-bottom: 0; }
+  .policy-dot { color: var(--rose); flex-shrink: 0; margin-top: 2px; }
+  .modal-footer {
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 10px;
+    position: sticky; bottom: 0; background: var(--bg2);
+  }
+  .modal-agree {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12px; color: var(--muted); cursor: pointer;
+    margin-bottom: 4px;
+  }
+  .modal-agree input { accent-color: var(--rose); margin-top: 2px; flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; }
+  .modal-buttons { display: flex; gap: 10px; }
+
 
   .no-date-msg { font-size: 12px; color: var(--dim); letter-spacing: 1px; margin-top: 10px; }
 `;
@@ -606,6 +669,8 @@ export default function BeautyBooking() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [showPolicy, setShowPolicy] = useState(false);
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
   // Load booked slots on mount
   useState(() => {
@@ -885,6 +950,59 @@ export default function BeautyBooking() {
               : null}
           </div>
         </div>
+
+        {/* POLICY MODAL */}
+        {showPolicy && (
+          <div className="modal-overlay" onClick={(e) => { if (e.target.className === 'modal-overlay') setShowPolicy(false); }}>
+            <div className="modal">
+              <div className="modal-header">
+                <h2>Studio Policies</h2>
+                <p>Please read and agree before booking</p>
+              </div>
+              <div className="modal-body">
+
+                <div className="policy-section">
+                  <h3>Deposits & Cancellations</h3>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>A non-refundable $10 deposit is required to secure your appointment.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Cancellations must be made at least <strong style={{color:"var(--text)"}}>24 hours in advance</strong>. Cancellations made less than 24 hours before your appointment will forfeit the deposit.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Your deposit is <strong style={{color:"var(--text)"}}>transferable to a reschedule</strong> if notice is given at least 24 hours in advance.</span></div>
+                </div>
+
+                <div className="policy-section">
+                  <h3>Late Arrivals</h3>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>There is a <strong style={{color:"var(--text)"}}>10-minute grace period</strong> for late arrivals.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Arrivals more than 10 minutes late will be subject to a <strong style={{color:"var(--text)"}}>$10 late fee</strong>.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Significantly late arrivals may result in a shortened service or cancelled appointment at the artist's discretion.</span></div>
+                </div>
+
+                <div className="policy-section">
+                  <h3>Refund Policy</h3>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span><strong style={{color:"var(--text)"}}>No refunds</strong> are offered on any services rendered.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>If you are unhappy with your service, please reach out within 48 hours and we will work to make it right.</span></div>
+                </div>
+
+                <div className="policy-section">
+                  <h3>Health & Safety</h3>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Services will not be performed on <strong style={{color:"var(--text)"}}>damaged, infected, or compromised nail beds</strong>. Please reschedule if this applies to you.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span><strong style={{color:"var(--text)"}}>Foreign soak offs are not offered.</strong> Only sets applied by Acrylic Faerie will be soaked off.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Please arrive with <strong style={{color:"var(--text)"}}>clean, bare nails</strong> — no polish, gel, or product of any kind.</span></div>
+                  <div className="policy-item"><span className="policy-dot">✦</span><span>Please inform us of any allergies or skin sensitivities prior to your appointment.</span></div>
+                </div>
+
+              </div>
+              <div className="modal-footer">
+                <label className="modal-agree">
+                  <input type="checkbox" checked={agreedToPolicy} onChange={e => setAgreedToPolicy(e.target.checked)} />
+                  I have read and agree to all studio policies listed above.
+                </label>
+                <div className="modal-buttons">
+                  <button className="btn btn-ghost" style={{flex:1}} onClick={() => { setShowPolicy(false); setAgreedToPolicy(false); }}>Cancel</button>
+                  <button className="btn btn-primary" style={{flex:2}} disabled={!agreedToPolicy} onClick={() => { setShowPolicy(false); handleConfirm(); }}>Agree & Proceed ✦</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
