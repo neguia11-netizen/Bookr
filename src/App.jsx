@@ -3,7 +3,7 @@ const SUPABASE_URL = "https://yqiwwdedbvxfdrmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
 async function getBookedSlots() {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=date,time`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=date,time&status=neq.cancelled`, {
     headers: {
       "apikey": SUPABASE_KEY,
       "Authorization": `Bearer ${SUPABASE_KEY}`,
@@ -640,8 +640,53 @@ export default function BeautyBooking() {
   ];
 
   async function handleConfirm() {
-    // Just advance to deposit step — emails fire after payment on success page
-    setStep(4);
+    setSending(true);
+    setSendError(false);
+    const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
+    try {
+      // Save pending booking to Supabase to hold the slot
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation",
+        },
+        body: JSON.stringify({
+          service: selectedService.name,
+          date: bookingDate,
+          time: selectedTime,
+          client_name: `${form.first} ${form.last}`,
+          client_email: form.email,
+          client_phone: form.phone,
+          notes: form.notes || "",
+          status: "pending",
+          duration: formatDuration(selectedService.duration),
+          price: selectedService.priceLabel,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to save booking");
+      const [saved] = await res.json();
+      // Store booking ID in sessionStorage so success page can mark it paid
+      sessionStorage.setItem("bookingId", saved.id);
+      sessionStorage.setItem("bookingEmail", form.email);
+      sessionStorage.setItem("bookingService", selectedService.name);
+      sessionStorage.setItem("bookingDate", bookingDate);
+      sessionStorage.setItem("bookingTime", selectedTime);
+      sessionStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
+      sessionStorage.setItem("bookingPrice", selectedService.priceLabel);
+      sessionStorage.setItem("bookingName", `${form.first} ${form.last}`);
+      sessionStorage.setItem("bookingPhone", form.phone);
+      // Refresh booked slots so calendar updates immediately
+      const slots = await getBookedSlots();
+      setBookedSlots(slots);
+      setStep(4);
+    } catch {
+      setSendError(true);
+    } finally {
+      setSending(false);
+    }
   }
 
   function buildStripeLink() {
