@@ -910,7 +910,7 @@ export default function BeautyBooking() {
               <div style={{marginTop:24, background:"var(--bg2)", border:"1px solid var(--border)", padding:"20px 24px"}}>
                 <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:14}}>Studio Policies</div>
                 <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.8,display:"flex",flexDirection:"column",gap:8}}>
-                  <p>✦ <strong style={{color:"var(--text)"}}>Deposits:</strong> $10 deposit required. Transferable to a reschedule with 24+ hours notice.</p>
+                  <p>✦ <strong style={{color:"var(--text)"}}>Deposits:</strong> $10 deposit required. Transferable to one reschedule with 24+ hours notice. Additional reschedules require a new deposit.</p>
                   <p>✦ <strong style={{color:"var(--text)"}}>Cancellations:</strong> Must cancel 24+ hours in advance or deposit is forfeited.</p>
                   <p>✦ <strong style={{color:"var(--text)"}}>Late Arrivals:</strong> 10-minute grace period. $10 late fee after 10 minutes.</p>
                   <p>✦ <strong style={{color:"var(--text)"}}>Refunds:</strong> No refunds on services rendered.</p>
