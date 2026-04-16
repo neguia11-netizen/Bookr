@@ -639,55 +639,19 @@ export default function BeautyBooking() {
     true,
   ];
 
-  async function handleConfirm() {
-    setSending(true);
-    setSendError(false);
+  function handleConfirm() {
+    // Store booking in sessionStorage — only saved to Supabase after deposit paid
     const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
-    try {
-      // Save pending booking to Supabase to hold the slot
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json",
-          "Prefer": "return=representation",
-          "Accept": "application/json",
-        },
-        body: JSON.stringify({
-          service: selectedService.name,
-          date: bookingDate,
-          time: selectedTime,
-          client_name: `${form.first} ${form.last}`,
-          client_email: form.email,
-          client_phone: form.phone,
-          notes: form.notes || "",
-          status: "pending",
-          duration: formatDuration(selectedService.duration),
-          price: selectedService.priceLabel,
-        }),
-      });
-      if (!res.ok) throw new Error("Failed to save booking");
-      const [saved] = await res.json();
-      // Store booking ID in sessionStorage so success page can mark it paid
-      sessionStorage.setItem("bookingId", saved.id);
-      sessionStorage.setItem("bookingEmail", form.email);
-      sessionStorage.setItem("bookingService", selectedService.name);
-      sessionStorage.setItem("bookingDate", bookingDate);
-      sessionStorage.setItem("bookingTime", selectedTime);
-      sessionStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
-      sessionStorage.setItem("bookingPrice", selectedService.priceLabel);
-      sessionStorage.setItem("bookingName", `${form.first} ${form.last}`);
-      sessionStorage.setItem("bookingPhone", form.phone);
-      // Refresh booked slots so calendar updates immediately
-      const slots = await getBookedSlots();
-      setBookedSlots(slots);
-      setStep(4);
-    } catch {
-      setSendError(true);
-    } finally {
-      setSending(false);
-    }
+    sessionStorage.setItem("bookingService", selectedService.name);
+    sessionStorage.setItem("bookingDate", bookingDate);
+    sessionStorage.setItem("bookingTime", selectedTime);
+    sessionStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
+    sessionStorage.setItem("bookingPrice", selectedService.priceLabel);
+    sessionStorage.setItem("bookingName", `${form.first} ${form.last}`);
+    sessionStorage.setItem("bookingEmail", form.email);
+    sessionStorage.setItem("bookingPhone", form.phone);
+    sessionStorage.setItem("bookingNotes", form.notes || "");
+    setStep(4);
   }
 
   function buildStripeLink() {
