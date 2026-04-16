@@ -1,5 +1,5 @@
 
-const SUPABASE_URL = "https://yqiwwdedbvxfdrmwdtr.supabase.co";
+const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
 async function getBookedSlots() {
