@@ -120,17 +120,17 @@ export default function Success() {
   const [booking, setBooking] = useState(null);
 
   useEffect(() => {
-    const id      = sessionStorage.getItem("bookingId");
-    const email   = sessionStorage.getItem("bookingEmail");
-    const service = sessionStorage.getItem("bookingService");
-    const date    = sessionStorage.getItem("bookingDate");
-    const time    = sessionStorage.getItem("bookingTime");
-    const duration= sessionStorage.getItem("bookingDuration");
-    const price   = sessionStorage.getItem("bookingPrice");
-    const name    = sessionStorage.getItem("bookingName");
-    const phone   = sessionStorage.getItem("bookingPhone");
+    const id      = localStorage.getItem("bookingId");
+    const email   = localStorage.getItem("bookingEmail");
+    const service = localStorage.getItem("bookingService");
+    const date    = localStorage.getItem("bookingDate");
+    const time    = localStorage.getItem("bookingTime");
+    const duration= localStorage.getItem("bookingDuration");
+    const price   = localStorage.getItem("bookingPrice");
+    const name    = localStorage.getItem("bookingName");
+    const phone   = localStorage.getItem("bookingPhone");
 
-    const notes = sessionStorage.getItem("bookingNotes") || "";
+    const notes = localStorage.getItem("bookingNotes") || "";
 
     if (service && date && time) {
       setBooking({ service, date, time, name, email });
@@ -153,8 +153,8 @@ export default function Success() {
         }),
       ]);
 
-      // Clear sessionStorage so refreshing doesn't re-trigger
-      sessionStorage.clear();
+      // Clear localStorage so refreshing doesn't re-trigger
+      localStorage.clear();
     }
   }, []);
 
