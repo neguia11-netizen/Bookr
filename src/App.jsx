@@ -1,3 +1,32 @@
+
+const SUPABASE_URL = "https://yqiwwdedbvxfdrmwdtr.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
+
+async function getBookedSlots() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=date,time`, {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+    }
+  });
+  if (!res.ok) return [];
+  return await res.json();
+}
+
+async function saveBooking(booking) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal",
+    },
+    body: JSON.stringify(booking),
+  });
+  if (!res.ok) throw new Error("Failed to save booking");
+}
+
 const STRIPE_DEPOSIT_LINK = "https://book.stripe.com/8x29AS728g7V7iAfiI1ck00";
 import { useState } from "react";
 
@@ -576,6 +605,22 @@ export default function BeautyBooking() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
+
+  // Load booked slots on mount
+  useState(() => {
+    getBookedSlots().then(slots => setBookedSlots(slots));
+  }, []);
+
+  function isSlotBooked(year, month, day, time) {
+    const date = `${MONTHS[month]} ${day}, ${year}`;
+    return bookedSlots.some(s => s.date === date && s.time === time);
+  }
+
+  function isDayFullyBooked(year, month, day) {
+    const times = getAvailableTimes(year, month, day);
+    return times.length > 0 && times.every(t => isSlotBooked(year, month, day, t));
+  }
 
   const categories = [...new Set(SERVICES.map(s => s.category))];
   const daysInMonth = getDaysInMonth(calYear, calMonth);
@@ -595,27 +640,25 @@ export default function BeautyBooking() {
   ];
 
   async function handleConfirm() {
-    setSending(true);
-    setSendError(false);
-    try {
-      await sendEmail({
-        service: selectedService.name,
-        date: `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`,
-        time: selectedTime,
-        duration: formatDuration(selectedService.duration),
-        price: selectedService.priceLabel,
-        client_name: `${form.first} ${form.last}`,
-        client_email: form.email,
-        client_phone: form.phone,
-        notes: form.notes || "None",
-      });
-      setStep(4);
-    } catch {
-      setSendError(true);
-    } finally {
-      setSending(false);
-    }
+    // Just advance to deposit step — emails fire after payment on success page
+    setStep(4);
   }
+
+  function buildStripeLink() {
+    const params = new URLSearchParams({
+      service: selectedService?.name || "",
+      date: `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`,
+      time: selectedTime || "",
+      duration: formatDuration(selectedService?.duration),
+      price: selectedService?.priceLabel || "",
+      name: `${form.first} ${form.last}`,
+      email: form.email,
+      phone: form.phone,
+      notes: form.notes || "",
+    });
+    return `${STRIPE_DEPOSIT_LINK}?${params.toString()}`;
+  }
+
 
   if (submitted) {
     return (
@@ -710,8 +753,8 @@ export default function BeautyBooking() {
                     {calDays.map((cell, i) => (
                       <div key={i}
                         className={`cal-day ${cell.current ? "current-month" : ""} ${cell.current && isToday(cell.day) ? "today" : ""} ${selectedDay === cell.day && cell.current ? "selected" : ""}`}
-                        onClick={() => { if (cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
-                        style={{ opacity: cell.current && (isPast(cell.day) || !isAvailableDay(calYear, calMonth, cell.day)) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) ? "pointer" : "default" }}
+                        onClick={() => { if (cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
+                        style={{ opacity: cell.current && (isPast(cell.day) || !isAvailableDay(calYear, calMonth, cell.day) || isDayFullyBooked(calYear, calMonth, cell.day)) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day) ? "pointer" : "default" }}
                       >{cell.day || ""}</div>
                     ))}
                   </div>
@@ -720,9 +763,16 @@ export default function BeautyBooking() {
                   <div className="times-label">{selectedDay ? `${MONTHS[calMonth]} ${selectedDay} — Pick a time` : "Select a date first"}</div>
                   {selectedDay ? (
                     <div className="times-grid">
-                      {getAvailableTimes(calYear, calMonth, selectedDay).map(t => (
-                        <div key={t} className={`time-slot ${selectedTime === t ? "selected" : ""}`} onClick={() => setSelectedTime(t)}>{t}</div>
-                      ))}
+                      {getAvailableTimes(calYear, calMonth, selectedDay).map(t => {
+                        const booked = isSlotBooked(calYear, calMonth, selectedDay, t);
+                        return (
+                          <div key={t}
+                            className={`time-slot ${selectedTime === t ? "selected" : ""} ${booked ? "booked" : ""}`}
+                            onClick={() => !booked && setSelectedTime(t)}
+                            style={{ opacity: booked ? 0.3 : 1, cursor: booked ? "not-allowed" : "pointer", textDecoration: booked ? "line-through" : "none" }}
+                          >{t}{booked ? " ✗" : ""}</div>
+                        );
+                      })}
                     </div>
                   ) : (
                     <p className="no-date-msg">← Choose a date on the calendar</p>
@@ -802,7 +852,7 @@ export default function BeautyBooking() {
                   Your booking details have been sent to your email.<br/>
                   Please complete your $10 deposit below to finalize your appointment.
                 </p>
-                <a href={STRIPE_DEPOSIT_LINK} target="_blank" rel="noopener noreferrer" style={{display:"inline-block"}}>
+                <a href={buildStripeLink()} target="_blank" rel="noopener noreferrer" style={{display:"inline-block"}}>
                   <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}}>
                     Pay $10 Deposit ✦
                   </button>
