@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const SUPABASE_URL = "https://yqiwwdedbvxfdrmwdtr.supabase.co";
+const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
 const EMAILJS_SERVICE_ID = "service_qj22hlr";
@@ -8,17 +8,18 @@ const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
 const EMAILJS_CLIENT_TEMPLATE_ID = "template_0az8fc7";
 const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
 
-async function markBookingPaid(id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
-    method: "PATCH",
+async function saveBooking(data) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+    method: "POST",
     headers: {
       "apikey": SUPABASE_KEY,
       "Authorization": `Bearer ${SUPABASE_KEY}`,
       "Content-Type": "application/json",
+      "Prefer": "return=minimal",
     },
-    body: JSON.stringify({ status: "paid" }),
+    body: JSON.stringify({ ...data, status: "paid" }),
   });
-  if (!res.ok) throw new Error("Failed to update booking");
+  if (!res.ok) throw new Error("Failed to save booking");
 }
 
 async function sendEmailToTemplate(templateId, params) {
@@ -129,18 +130,26 @@ export default function Success() {
     const name    = sessionStorage.getItem("bookingName");
     const phone   = sessionStorage.getItem("bookingPhone");
 
-    if (id && service && date && time) {
+    const notes = sessionStorage.getItem("bookingNotes") || "";
+
+    if (service && date && time) {
       setBooking({ service, date, time, name, email });
 
-      // Mark as paid in Supabase + send emails simultaneously
+      // Save booking to Supabase as paid + send emails simultaneously
       Promise.allSettled([
-        markBookingPaid(id),
+        saveBooking({
+          service, date, time, duration, price,
+          client_name: name,
+          client_email: email,
+          client_phone: phone,
+          notes,
+        }),
         sendEmail({
           service, date, time, duration, price,
           client_name: name,
           client_email: email,
           client_phone: phone,
-          notes: sessionStorage.getItem("bookingNotes") || "None",
+          notes: notes || "None",
         }),
       ]);
 
