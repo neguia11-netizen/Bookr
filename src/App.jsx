@@ -640,17 +640,17 @@ export default function BeautyBooking() {
   ];
 
   function handleConfirm() {
-    // Store booking in sessionStorage — only saved to Supabase after deposit paid
+    // Store booking in localStorage — only saved to Supabase after deposit paid
     const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
-    sessionStorage.setItem("bookingService", selectedService.name);
-    sessionStorage.setItem("bookingDate", bookingDate);
-    sessionStorage.setItem("bookingTime", selectedTime);
-    sessionStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
-    sessionStorage.setItem("bookingPrice", selectedService.priceLabel);
-    sessionStorage.setItem("bookingName", `${form.first} ${form.last}`);
-    sessionStorage.setItem("bookingEmail", form.email);
-    sessionStorage.setItem("bookingPhone", form.phone);
-    sessionStorage.setItem("bookingNotes", form.notes || "");
+    localStorage.setItem("bookingService", selectedService.name);
+    localStorage.setItem("bookingDate", bookingDate);
+    localStorage.setItem("bookingTime", selectedTime);
+    localStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
+    localStorage.setItem("bookingPrice", selectedService.priceLabel);
+    localStorage.setItem("bookingName", `${form.first} ${form.last}`);
+    localStorage.setItem("bookingEmail", form.email);
+    localStorage.setItem("bookingPhone", form.phone);
+    localStorage.setItem("bookingNotes", form.notes || "");
     setStep(4);
   }
 
