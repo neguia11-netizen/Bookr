@@ -13,6 +13,24 @@ async function getBookedSlots() {
   return await res.json();
 }
 
+
+
+async function fetchAvailability() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/availability?select=date,time`, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) return [];
+  return await res.json();
+}
+
+async function fetchBlockedDates() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates?select=date`, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) return [];
+  return await res.json();
+}
+
 async function saveBooking(booking) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
     method: "POST",
@@ -49,47 +67,9 @@ const SERVICES = [
   { id: 11, category: "Add-Ons", icon: "✿", name: "Nail Fix (Add-On)", description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.", duration: 10, priceLabel: "$5.00 per nail" },
 ];
 
-// Availability: key is "YYYY-M-D", value is array of available times
-const AVAILABILITY = {
-  // April 2026
-  "2026-4-18": ["10:00 AM", "2:00 PM", "6:00 PM"],
-  "2026-4-19": ["4:00 PM"],
-  "2026-4-20": ["1:00 PM", "5:00 PM"],
-  "2026-4-21": ["12:00 PM", "5:00 PM"],
-  "2026-4-22": ["10:00 AM", "3:00 PM"],
-  "2026-4-24": ["12:00 PM", "4:00 PM"],
-  "2026-4-25": ["10:00 AM", "3:00 PM"],
-  "2026-4-27": ["9:00 AM", "2:00 PM"],
-  "2026-4-28": ["1:00 PM", "5:00 PM"],
-  "2026-4-29": ["11:00 AM", "4:00 PM"],
-  // May 2026
-  "2026-5-1":  ["10:00 AM", "3:00 PM"],
-  "2026-5-4":  ["10:00 AM", "4:00 PM"],
-  "2026-5-5":  ["9:00 AM", "4:00 PM"],
-  "2026-5-6":  ["10:00 AM", "3:00 PM"],
-  "2026-5-11": ["9:00 AM", "3:00 PM", "6:00 PM"],
-  "2026-5-12": ["10:00 AM", "3:00 PM", "6:00 PM"],
-  "2026-5-13": ["10:00 AM", "3:00 PM"],
-  "2026-5-15": ["9:00 AM", "3:00 PM"],
-  "2026-5-17": ["10:00 AM", "2:00 PM", "5:00 PM"],
-  "2026-5-18": ["10:00 AM", "2:00 PM", "5:00 PM"],
-  "2026-5-19": ["10:00 AM", "4:00 PM"],
-  "2026-5-22": ["10:00 AM", "2:00 PM", "5:00 PM"],
-  "2026-5-25": ["9:00 AM", "2:00 PM", "5:00 PM"],
-  "2026-5-26": ["10:00 AM", "2:00 PM", "6:00 PM"],
-  "2026-5-29": ["11:00 AM", "3:00 PM"],
-  "2026-5-30": ["10:00 AM", "3:00 PM", "6:00 PM"],
-};
+// Availability is now loaded from Supabase dynamically
 
-function getAvailableTimes(year, month, day) {
-  const key = `${year}-${month + 1}-${day}`;
-  return AVAILABILITY[key] || [];
-}
-
-function isAvailableDay(year, month, day) {
-  const key = `${year}-${month + 1}-${day}`;
-  return !!AVAILABILITY[key];
-}
+// These are now dynamic — see getAvailableTimesFromData and isAvailableDayFromData in the component
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -669,13 +649,44 @@ export default function BeautyBooking() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
+  const [blockedDates, setBlockedDates] = useState([]);
+  const [availabilityData, setAvailabilityData] = useState([]);
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
-  // Load booked slots on mount
+  // Load booked slots, blocked dates, and availability on mount
   useState(() => {
     getBookedSlots().then(slots => setBookedSlots(slots));
+    fetchBlockedDates().then(dates => setBlockedDates(dates));
+    fetchAvailability().then(avail => setAvailabilityData(avail));
   }, []);
+
+  function getAvailableTimesFromData(year, month, day) {
+    const dateStr = `${MONTHS[month]} ${day}, ${year}`;
+    return availabilityData
+      .filter(a => a.date === dateStr)
+      .map(a => a.time)
+      .sort((a, b) => {
+        const toMin = t => {
+          const [time, period] = t.split(' ');
+          let [h, m] = time.split(':').map(Number);
+          if (period === 'PM' && h !== 12) h += 12;
+          if (period === 'AM' && h === 12) h = 0;
+          return h * 60 + m;
+        };
+        return toMin(a) - toMin(b);
+      });
+  }
+
+  function isAvailableDayFromData(year, month, day) {
+    const dateStr = `${MONTHS[month]} ${day}, ${year}`;
+    return availabilityData.some(a => a.date === dateStr);
+  }
+
+  function isBlocked(year, month, day) {
+    const date = `${MONTHS[month]} ${day}, ${year}`;
+    return blockedDates.some(b => b.date === date);
+  }
 
   function isSlotBooked(year, month, day, time) {
     const date = `${MONTHS[month]} ${day}, ${year}`;
@@ -821,8 +832,8 @@ export default function BeautyBooking() {
                     {calDays.map((cell, i) => (
                       <div key={i}
                         className={`cal-day ${cell.current ? "current-month" : ""} ${cell.current && isToday(cell.day) ? "today" : ""} ${selectedDay === cell.day && cell.current ? "selected" : ""}`}
-                        onClick={() => { if (cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
-                        style={{ opacity: cell.current && (isPast(cell.day) || !isAvailableDay(calYear, calMonth, cell.day) || isDayFullyBooked(calYear, calMonth, cell.day)) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) && isAvailableDay(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day) ? "pointer" : "default" }}
+                        onClick={() => { if (cell.current && !isPast(cell.day) && isAvailableDayFromData(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day) && !isBlocked(calYear, calMonth, cell.day)) { setSelectedDay(cell.day); setSelectedTime(null); } }}
+                        style={{ opacity: cell.current && (isPast(cell.day) || !isAvailableDayFromData(calYear, calMonth, cell.day) || isDayFullyBooked(calYear, calMonth, cell.day) || isBlocked(calYear, calMonth, cell.day)) ? 0.2 : 1, cursor: cell.current && !isPast(cell.day) && isAvailableDayFromData(calYear, calMonth, cell.day) && !isDayFullyBooked(calYear, calMonth, cell.day) && !isBlocked(calYear, calMonth, cell.day) ? "pointer" : "default" }}
                       >{cell.day || ""}</div>
                     ))}
                   </div>
@@ -831,7 +842,7 @@ export default function BeautyBooking() {
                   <div className="times-label">{selectedDay ? `${MONTHS[calMonth]} ${selectedDay} — Pick a time` : "Select a date first"}</div>
                   {selectedDay ? (
                     <div className="times-grid">
-                      {getAvailableTimes(calYear, calMonth, selectedDay).map(t => {
+                      {getAvailableTimesFromData(calYear, calMonth, selectedDay).map(t => {
                         const booked = isSlotBooked(calYear, calMonth, selectedDay, t);
                         return (
                           <div key={t}
