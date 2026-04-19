@@ -32,6 +32,68 @@ async function deleteBooking(id) {
   if (!res.ok) throw new Error("Failed to delete");
 }
 
+
+async function fetchBlockedDates() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates?select=*`, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error("Failed to fetch blocked dates");
+  return await res.json();
+}
+
+async function blockDate(date, reason) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal",
+    },
+    body: JSON.stringify({ date, reason }),
+  });
+  if (!res.ok) throw new Error("Failed to block date");
+}
+
+async function unblockDate(id) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates?id=eq.${id}`, {
+    method: "DELETE",
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error("Failed to unblock date");
+}
+
+
+async function fetchAvailability() {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/availability?select=*&order=date.asc,time.asc`, {
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error("Failed to fetch availability");
+  return await res.json();
+}
+
+async function addAvailability(date, time) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/availability`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal",
+    },
+    body: JSON.stringify({ date, time }),
+  });
+  if (!res.ok) throw new Error("Failed to add availability");
+}
+
+async function removeAvailability(id) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/availability?id=eq.${id}`, {
+    method: "DELETE",
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+  });
+  if (!res.ok) throw new Error("Failed to remove availability");
+}
+
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
   :root {
@@ -149,6 +211,38 @@ const styles = `
   .tab.active { color: var(--rose-lt); border-bottom-color: var(--rose); }
   .tab:hover { color: var(--muted); }
   .loading { text-align: center; padding: 60px; color: var(--dim); font-size: 13px; letter-spacing: 2px; }
+  .avail-panel { padding: 24px; }
+  .avail-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
+  .avail-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
+  .time-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .time-chip {
+    padding: 6px 12px; border: 1px solid var(--border2); background: var(--bg);
+    font-size: 11px; letter-spacing: 1px; color: var(--muted); cursor: pointer;
+    transition: all 0.15s; border-radius: 2px;
+  }
+  .time-chip:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
+  .time-chip.selected { background: #200e18; border-color: var(--rose); color: var(--rose-lt); }
+  .avail-date-group { margin-bottom: 20px; background: var(--bg2); border: 1px solid var(--border); }
+  .avail-date-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: var(--rose-lt); display: flex; justify-content: space-between; align-items: center; }
+  .avail-times { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 16px; }
+  .avail-time-tag { display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--bg3); border: 1px solid var(--border2); font-size: 12px; color: var(--text); }
+  .avail-time-remove { background: none; border: none; color: var(--rose-dim); cursor: pointer; font-size: 14px; padding: 0 2px; transition: color 0.15s; }
+  .avail-time-remove:hover { color: var(--rose); }
+  .month-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .month-nav h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; }
+
+  /* BLOCK DATE */
+  .block-panel { padding: 24px; border-top: 1px solid var(--border); }
+  .block-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
+  .block-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+  .block-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color 0.2s; flex: 1; min-width: 140px; }
+  .block-input:focus { border-color: var(--rose-dim); }
+  .blocked-list { display: flex; flex-direction: column; gap: 6px; }
+  .blocked-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); font-size: 13px; }
+  .blocked-date { color: var(--rose-lt); font-family: 'Playfair Display', serif; font-style: italic; }
+  .blocked-reason { color: var(--muted); font-size: 12px; }
+  .btn-sm { padding: 6px 14px; font-size: 10px; letter-spacing: 2px; }
+
 `;
 
 export default function Admin() {
@@ -163,6 +257,16 @@ export default function Admin() {
   const [calYear, setCalYear] = useState(today.getFullYear());
   const [calMonth, setCalMonth] = useState(today.getMonth());
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [blockedDates, setBlockedDates] = useState([]);
+  const [blockDateInput, setBlockDateInput] = useState("");
+  const [blockReason, setBlockReason] = useState("");
+  const [blocking, setBlocking] = useState(false);
+  const [availability, setAvailability] = useState([]);
+  const [availDateInput, setAvailDateInput] = useState("");
+  const [selectedTimes, setSelectedTimes] = useState([]);
+  const [savingAvail, setSavingAvail] = useState(false);
+  const [availMonth, setAvailMonth] = useState(new Date().getMonth());
+  const [availYear, setAvailYear] = useState(new Date().getFullYear());
 
   function login() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); loadBookings(); }
@@ -171,9 +275,75 @@ export default function Admin() {
 
   async function loadBookings() {
     setLoading(true);
-    try { const data = await fetchBookings(); setBookings(data); }
-    catch { }
+    try {
+      const [data, blocked, avail] = await Promise.all([fetchBookings(), fetchBlockedDates(), fetchAvailability()]);
+      setBookings(data);
+      setBlockedDates(blocked);
+      setAvailability(avail);
+    } catch { }
     finally { setLoading(false); }
+  }
+
+  const TIME_OPTIONS = ["8:00 AM","9:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM"];
+
+  async function handleAddAvailability() {
+    if (!availDateInput || selectedTimes.length === 0) return;
+    setSavingAvail(true);
+    // Format date as "Month D, YYYY"
+    const d = new Date(availDateInput + "T12:00:00");
+    const dateStr = `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    try {
+      await Promise.all(selectedTimes.map(t => addAvailability(dateStr, t)));
+      const avail = await fetchAvailability();
+      setAvailability(avail);
+      setAvailDateInput("");
+      setSelectedTimes([]);
+    } catch { }
+    finally { setSavingAvail(false); }
+  }
+
+  async function handleRemoveAvailability(id) {
+    await removeAvailability(id);
+    setAvailability(prev => prev.filter(a => a.id !== id));
+  }
+
+  function toggleTime(t) {
+    setSelectedTimes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+  }
+
+  function availForMonth(month, year) {
+    const grouped = {};
+    availability.forEach(a => {
+      const d = new Date(a.date);
+      if (d.getMonth() === month && d.getFullYear() === year) {
+        if (!grouped[a.date]) grouped[a.date] = [];
+        grouped[a.date].push(a);
+      }
+    });
+    return Object.entries(grouped).sort((x, y) => new Date(x[0]) - new Date(y[0]));
+  }
+
+  async function handleBlockDate() {
+    if (!blockDateInput) return;
+    setBlocking(true);
+    try {
+      await blockDate(blockDateInput, blockReason);
+      const blocked = await fetchBlockedDates();
+      setBlockedDates(blocked);
+      setBlockDateInput("");
+      setBlockReason("");
+    } catch { }
+    finally { setBlocking(false); }
+  }
+
+  async function handleUnblock(id) {
+    await unblockDate(id);
+    setBlockedDates(prev => prev.filter(b => b.id !== id));
+  }
+
+  function isDateBlocked(day) {
+    const dateStr = `${MONTHS[calMonth]} ${day}, ${calYear}`;
+    return blockedDates.some(b => b.date === dateStr);
   }
 
   async function handleDelete(id) {
@@ -239,6 +409,8 @@ export default function Admin() {
           <div className="tab-row">
             <button className={`tab ${tab === "calendar" ? "active" : ""}`} onClick={() => setTab("calendar")}>Calendar View</button>
             <button className={`tab ${tab === "list" ? "active" : ""}`} onClick={() => setTab("list")}>All Bookings</button>
+            <button className={`tab ${tab === "blocked" ? "active" : ""}`} onClick={() => setTab("blocked")}>Block Dates</button>
+            <button className={`tab ${tab === "availability" ? "active" : ""}`} onClick={() => setTab("availability")}>Availability</button>
           </div>
         </div>
 
@@ -259,10 +431,12 @@ export default function Admin() {
                   const dayBookings = bookingsForDay(day);
                   const hasBooking = dayBookings.length > 0;
                   const isToday = day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
+                  const blocked = isDateBlocked(day);
                   return (
                     <div key={i}
-                      className={`cal-day current ${isToday ? "today" : ""} ${hasBooking ? "has-booking" : ""} ${selectedDay === day ? "selected" : ""}`}
+                      className={`cal-day current ${isToday ? "today" : ""} ${hasBooking ? "has-booking" : ""} ${selectedDay === day ? "selected" : ""} ${blocked ? "blocked" : ""}`}
                       onClick={() => setSelectedDay(selectedDay === day ? null : day)}
+                      style={{ opacity: blocked ? 0.4 : 1, textDecoration: blocked ? "line-through" : "none" }}
                     >
                       {day}
                       {hasBooking && (
@@ -314,6 +488,103 @@ export default function Admin() {
                       : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel Booking</button>
                     }
                   </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {!loading && tab === "availability" && (
+          <div className="avail-panel">
+            <h3 className="avail-title">Manage Availability</h3>
+            <p style={{fontSize:12,color:"var(--muted)",marginBottom:24,letterSpacing:0.5,lineHeight:1.7}}>
+              Add dates and times that clients can book. Changes appear on the booking site immediately.
+            </p>
+
+            <div style={{background:"var(--bg2)",border:"1px solid var(--border)",padding:"20px 24px",marginBottom:28}}>
+              <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:16}}>Add New Availability</div>
+              <div className="avail-form">
+                <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                  <label style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)"}}>Date</label>
+                  <input type="date" className="block-input" value={availDateInput} onChange={e => setAvailDateInput(e.target.value)} />
+                </div>
+              </div>
+              <div style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)",marginBottom:8}}>Select Times</div>
+              <div className="time-chips">
+                {TIME_OPTIONS.map(t => (
+                  <div key={t} className={`time-chip ${selectedTimes.includes(t) ? "selected" : ""}`} onClick={() => toggleTime(t)}>{t}</div>
+                ))}
+              </div>
+              <div style={{marginTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                <span style={{fontSize:12,color:"var(--muted)"}}>
+                  {selectedTimes.length} time{selectedTimes.length !== 1 ? "s" : ""} selected
+                </span>
+                <button className="btn btn-primary btn-sm" disabled={!availDateInput || selectedTimes.length === 0 || savingAvail} onClick={handleAddAvailability}>
+                  {savingAvail ? "Saving..." : "Add Availability ✦"}
+                </button>
+              </div>
+            </div>
+
+            <div className="month-nav">
+              <button className="cal-nav-btn" onClick={() => { if (availMonth === 0) { setAvailMonth(11); setAvailYear(y => y-1); } else setAvailMonth(m => m-1); }}>‹</button>
+              <h3>{MONTHS[availMonth]} {availYear}</h3>
+              <button className="cal-nav-btn" onClick={() => { if (availMonth === 11) { setAvailMonth(0); setAvailYear(y => y+1); } else setAvailMonth(m => m+1); }}>›</button>
+            </div>
+
+            {availForMonth(availMonth, availYear).length === 0 && (
+              <p style={{fontSize:13,color:"var(--dim)",letterSpacing:1}}>No availability set for {MONTHS[availMonth]} {availYear}.</p>
+            )}
+            {availForMonth(availMonth, availYear).map(([date, slots]) => (
+              <div key={date} className="avail-date-group">
+                <div className="avail-date-header">
+                  <span>{date}</span>
+                  <span style={{fontSize:11,color:"var(--dim)"}}>{slots.length} slot{slots.length !== 1 ? "s" : ""}</span>
+                </div>
+                <div className="avail-times">
+                  {slots.sort((a,b) => a.time.localeCompare(b.time)).map(s => (
+                    <div key={s.id} className="avail-time-tag">
+                      {s.time}
+                      <button className="avail-time-remove" onClick={() => handleRemoveAvailability(s.id)}>✕</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && tab === "blocked" && (
+          <div className="block-panel">
+            <h3 className="block-title">Block Off Dates</h3>
+            <p style={{fontSize:12,color:"var(--muted)",marginBottom:20,letterSpacing:0.5,lineHeight:1.7}}>
+              Blocked dates will be grayed out on the booking calendar — clients won't be able to select them.
+            </p>
+            <div className="block-form">
+              <div style={{display:"flex",flexDirection:"column",gap:6}}>
+                <label style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)"}}>Date</label>
+                <input type="date" className="block-input" value={blockDateInput} onChange={e => setBlockDateInput(e.target.value)} />
+              </div>
+              <div style={{display:"flex",flexDirection:"column",gap:6,flex:1}}>
+                <label style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--muted)"}}>Reason (optional)</label>
+                <input type="text" className="block-input" placeholder="e.g. Vacation, Personal" value={blockReason} onChange={e => setBlockReason(e.target.value)} />
+              </div>
+              <button className="btn btn-primary btn-sm" disabled={!blockDateInput || blocking} onClick={handleBlockDate}>
+                {blocking ? "Blocking..." : "Block Date ✦"}
+              </button>
+            </div>
+
+            <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:12}}>
+              Currently Blocked — {blockedDates.length} date{blockedDates.length !== 1 ? "s" : ""}
+            </div>
+            {blockedDates.length === 0 && <p style={{fontSize:13,color:"var(--dim)",letterSpacing:1}}>No dates blocked yet.</p>}
+            <div className="blocked-list">
+              {blockedDates.sort((a,b) => new Date(a.date) - new Date(b.date)).map(b => (
+                <div key={b.id} className="blocked-item">
+                  <div>
+                    <div className="blocked-date">{b.date}</div>
+                    {b.reason && <div className="blocked-reason">{b.reason}</div>}
+                  </div>
+                  <button className="btn-danger" onClick={() => handleUnblock(b.id)}>Unblock</button>
                 </div>
               ))}
             </div>
