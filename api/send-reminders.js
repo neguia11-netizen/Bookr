@@ -65,9 +65,8 @@ export default async function handler(req, res) {
 
     const bookings = await bookingsRes.json();
 
-    const debugNow = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
     if (!bookings.length) {
-      return res.status(200).json({ message: `No appointments tomorrow (${tomorrowStr})`, sent: 0, debug_now_cst: debugNow, debug_tomorrow: tomorrowStr });
+      return res.status(200).json({ message: `No appointments tomorrow (${tomorrowStr})`, sent: 0 });
     }
 
     // Send reminder to each client
