@@ -1,4 +1,3 @@
-
 const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
@@ -46,7 +45,7 @@ async function saveBooking(booking) {
 }
 
 const STRIPE_DEPOSIT_LINK = "https://book.stripe.com/8x29AS728g7V7iAfiI1ck00";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const EMAILJS_SERVICE_ID = "service_qj22hlr";
 const EMAILJS_TEMPLATE_ID = "template_pp8uavo";       // sends to you
@@ -655,7 +654,7 @@ export default function BeautyBooking() {
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
   // Load booked slots, blocked dates, and availability on mount
-  useState(() => {
+  useEffect(() => {
     getBookedSlots().then(slots => setBookedSlots(slots));
     fetchBlockedDates().then(dates => setBlockedDates(dates));
     fetchAvailability().then(avail => setAvailabilityData(avail));
