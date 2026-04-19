@@ -3,11 +3,15 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import Success from './Success.jsx'
 import Portfolio from './Portfolio.jsx'
+import Admin from './Admin.jsx'
 
 const path = window.location.pathname;
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    {path === '/success' ? <Success /> : path === '/portfolio' ? <Portfolio /> : <App />}
+    {path === '/success' ? <Success />
+    : path === '/portfolio' ? <Portfolio />
+    : path === '/admin' ? <Admin />
+    : <App />}
   </React.StrictMode>,
 )
