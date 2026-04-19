@@ -914,6 +914,12 @@ export default function BeautyBooking() {
               </div>
               {sendError && <p className="error-msg">Something went wrong. Please try again.</p>}
 
+              <div style={{background:"#200e18",border:"1px solid var(--rose-dim)",padding:"12px 16px",marginTop:16,borderRadius:2}}>
+                <p style={{fontSize:12,color:"var(--rose-lt)",letterSpacing:0.5,lineHeight:1.7}}>
+                  ⚠️ After reviewing, you will be directed to pay a <strong>$10 deposit via Stripe</strong>. Your appointment is only confirmed once payment is completed.
+                </p>
+              </div>
+
               {/* INLINE POLICY */}
               <div style={{marginTop:24, background:"var(--bg2)", border:"1px solid var(--border)", padding:"20px 24px"}}>
                 <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:14}}>Studio Policies</div>
@@ -949,10 +955,12 @@ export default function BeautyBooking() {
                 </div>
               </div>
               <div style={{textAlign:"center", padding:"8px 0 16px"}}>
-                <p style={{fontSize:12,color:"var(--muted)",letterSpacing:1,marginBottom:24,lineHeight:1.7}}>
-                  Your booking details have been sent to your email.<br/>
-                  Please complete your $10 deposit below to finalize your appointment.
-                </p>
+                <div style={{background:"#200e18",border:"1px solid var(--rose-dim)",padding:"14px 20px",marginBottom:24,borderRadius:2}}>
+                  <p style={{fontSize:13,color:"var(--rose-lt)",letterSpacing:0.5,lineHeight:1.7,fontWeight:400}}>
+                    ⚠️ Your booking is <strong>not confirmed</strong> until the $10 deposit is paid.<br/>
+                    Please complete payment below to secure your appointment.
+                  </p>
+                </div>
                 <a href={buildStripeLink()} target="_blank" rel="noopener noreferrer" style={{display:"inline-block"}}>
                   <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}}>
                     Pay $10 Deposit ✦
