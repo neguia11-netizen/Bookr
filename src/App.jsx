@@ -1,18 +1,14 @@
+import { useState, useEffect } from "react";
 const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
 async function getBookedSlots() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=date,time&status=neq.cancelled&status=neq.null`, {
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    }
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
   });
   if (!res.ok) return [];
   return await res.json();
 }
-
-
 
 async function fetchAvailability() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/availability?select=date,time`, {
@@ -45,11 +41,10 @@ async function saveBooking(booking) {
 }
 
 const STRIPE_DEPOSIT_LINK = "https://book.stripe.com/8x29AS728g7V7iAfiI1ck00";
-import { useState, useEffect } from "react";
 
 const EMAILJS_SERVICE_ID = "service_qj22hlr";
-const EMAILJS_TEMPLATE_ID = "template_pp8uavo";       // sends to you
-const EMAILJS_CLIENT_TEMPLATE_ID = "template_0az8fc7"; // sends to client
+const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
+const EMAILJS_CLIENT_TEMPLATE_ID = "template_0az8fc7";
 const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
 
 const SERVICES = [
@@ -66,9 +61,6 @@ const SERVICES = [
   { id: 11, category: "Add-Ons", icon: "✿", name: "Nail Fix (Add-On)", description: "$5 per nail. Accidents happen! Add this if you have a cracked, lifted, or missing nail that needs repair. If you have 3 or more broken nails, please book a full set instead.", duration: 10, priceLabel: "$5.00 per nail" },
 ];
 
-// Availability is now loaded from Supabase dynamically
-
-// These are now dynamic — see getAvailableTimesFromData and isAvailableDayFromData in the component
 const DAYS = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 
@@ -104,38 +96,17 @@ const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
 
   :root {
-    --bg:        #0f0a0c;
-    --bg2:       #1a1015;
-    --bg3:       #221520;
-    --border:    #3a1f2e;
-    --border2:   #4d2a3d;
-    --rose:      #c4415a;
-    --rose-lt:   #e8839a;
-    --rose-dim:  #7a2840;
-    --pink:      #f0b8c8;
-    --text:      #f5e8ee;
-    --muted:     #9a7080;
-    --dim:       #5a3a48;
+    --bg: #0f0a0c; --bg2: #1a1015; --bg3: #221520;
+    --border: #3a1f2e; --border2: #4d2a3d;
+    --rose: #c4415a; --rose-lt: #e8839a; --rose-dim: #7a2840;
+    --pink: #f0b8c8; --text: #f5e8ee; --muted: #9a7080; --dim: #5a3a48;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { background: var(--bg); }
-
-  .app {
-    min-height: 100vh;
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  /* Leopard print background pattern */
+  .app { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; position: relative; overflow-x: hidden; }
   .app::before {
-    content: '';
-    position: fixed;
-    inset: 0;
+    content: ''; position: fixed; inset: 0;
     background-image:
       radial-gradient(ellipse 18px 12px at 8% 12%, #2a0f1a55 0%, transparent 70%),
       radial-gradient(ellipse 10px 16px at 18% 8%, #2a0f1a44 0%, transparent 70%),
@@ -163,475 +134,127 @@ const styles = `
       radial-gradient(ellipse 19px 13px at 58% 88%, #2a0f1a33 0%, transparent 70%),
       radial-gradient(ellipse 12px 17px at 75% 82%, #2a0f1a44 0%, transparent 70%),
       radial-gradient(ellipse 16px 11px at 90% 90%, #2a0f1a44 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.7;
+    pointer-events: none; z-index: 0; opacity: 0.7;
   }
-
   .app > * { position: relative; z-index: 1; }
 
-  /* HEADER */
-  .header {
-    text-align: center;
-    padding: 48px 24px 36px;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, #1e0d16 0%, transparent 100%);
-    position: relative;
-  }
-  .header-sparkle {
-    font-size: 13px;
-    letter-spacing: 8px;
-    color: var(--rose);
-    margin-bottom: 18px;
-    display: block;
-  }
-  .header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(40px, 8vw, 68px);
-    font-weight: 700;
-    font-style: italic;
-    letter-spacing: 2px;
-    color: var(--text);
-    line-height: 1;
-    text-shadow: 0 0 60px #c4415a55;
-  }
+  .header { text-align: center; padding: 48px 24px 36px; border-bottom: 1px solid var(--border); background: linear-gradient(180deg, #1e0d16 0%, transparent 100%); position: relative; }
+  .header-sparkle { font-size: 13px; letter-spacing: 8px; color: var(--rose); margin-bottom: 18px; display: block; }
+  .header h1 { font-family: 'Playfair Display', serif; font-size: clamp(40px, 8vw, 68px); font-weight: 700; font-style: italic; letter-spacing: 2px; color: var(--text); line-height: 1; text-shadow: 0 0 60px #c4415a55; }
   .header h1 span { color: var(--rose-lt); }
-  .header-sub {
-    margin-top: 12px;
-    font-size: 11px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--muted);
-  }
-  .header-divider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-    color: var(--rose-dim);
-    font-size: 11px;
-    letter-spacing: 3px;
-  }
-  .header-divider::before, .header-divider::after {
-    content: '';
-    width: 60px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--rose-dim));
-  }
+  .header-sub { margin-top: 12px; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); }
+  .header-divider { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 20px; color: var(--rose-dim); font-size: 11px; letter-spacing: 3px; }
+  .header-divider::before, .header-divider::after { content: ''; width: 60px; height: 1px; background: linear-gradient(90deg, transparent, var(--rose-dim)); }
   .header-divider::after { transform: scaleX(-1); }
 
-  /* STEPS */
-  .steps {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-  .step {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--dim);
-    cursor: pointer;
-    transition: color 0.3s;
-    padding: 6px 14px;
-  }
-  .step:not(:last-child)::after {
-    content: '›';
-    margin-left: 14px;
-    color: var(--border2);
-    font-size: 14px;
-  }
+  .steps { display: flex; justify-content: center; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--bg2); flex-wrap: wrap; gap: 4px; }
+  .step { display: flex; align-items: center; gap: 8px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); cursor: pointer; transition: color 0.3s; padding: 6px 14px; }
+  .step:not(:last-child)::after { content: '›'; margin-left: 14px; color: var(--border2); font-size: 14px; }
   .step.active { color: var(--rose-lt); }
   .step.done { color: var(--muted); cursor: pointer; }
-  .step-num {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    border: 1px solid currentColor;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 9px; flex-shrink: 0;
-  }
-  .step.active .step-num {
-    background: var(--rose);
-    border-color: var(--rose);
-    color: white;
-  }
+  .step-num { width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; display: flex; align-items: center; justify-content: center; font-size: 9px; flex-shrink: 0; }
+  .step.active .step-num { background: var(--rose); border-color: var(--rose); color: white; }
 
-  /* CONTAINER */
   .container { max-width: 880px; margin: 0 auto; padding: 44px 24px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 400; font-style: italic; color: var(--text); margin-bottom: 6px; }
+  .section-sub { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin-bottom: 32px; }
 
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 30px;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--text);
-    margin-bottom: 6px;
-  }
-  .section-sub {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 32px;
-  }
+  .category-label { display: flex; align-items: center; gap: 12px; font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--rose); margin: 32px 0 10px; }
+  .category-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--rose-dim), transparent); }
 
-  /* CATEGORY */
-  .category-label {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 10px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--rose);
-    margin: 32px 0 10px;
-  }
-  .category-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(90deg, var(--rose-dim), transparent);
-  }
-
-  /* SERVICE CARDS */
   .services-grid { display: grid; gap: 3px; }
-  .service-card {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 18px 20px;
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    cursor: pointer;
-    transition: all 0.25s;
-    position: relative;
-    overflow: hidden;
-    gap: 16px;
-  }
-  .service-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #c4415a08 0%, transparent 60%);
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
+  .service-card { display: flex; align-items: flex-start; justify-content: space-between; padding: 18px 20px; background: var(--bg2); border: 1px solid var(--border); cursor: pointer; transition: all 0.25s; position: relative; overflow: hidden; gap: 16px; }
+  .service-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, #c4415a08 0%, transparent 60%); opacity: 0; transition: opacity 0.3s; }
   .service-card:hover { border-color: var(--border2); background: var(--bg3); }
   .service-card:hover::after { opacity: 1; }
-  .service-card.selected {
-    background: #200e18;
-    border-color: var(--rose-dim);
-    box-shadow: inset 3px 0 0 var(--rose), 0 0 20px #c4415a18;
-  }
+  .service-card.selected { background: #200e18; border-color: var(--rose-dim); box-shadow: inset 3px 0 0 var(--rose), 0 0 20px #c4415a18; }
   .service-card.selected::after { opacity: 1; }
   .service-left { display: flex; align-items: flex-start; gap: 14px; flex: 1; }
   .service-icon { color: var(--rose); font-size: 13px; width: 18px; text-align: center; padding-top: 3px; flex-shrink: 0; }
   .service-info { flex: 1; }
   .service-name { font-size: 14px; font-weight: 400; color: var(--text); margin-bottom: 6px; letter-spacing: 0.3px; }
   .service-desc { font-size: 12px; color: var(--muted); line-height: 1.65; margin-bottom: 8px; }
-  .service-dur {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--dim);
-  }
+  .service-dur { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
   .service-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; flex-shrink: 0; }
-  .service-price {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 17px;
-    color: var(--rose-lt);
-    white-space: nowrap;
-  }
-  .check {
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--rose);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 10px; color: white;
-    box-shadow: 0 0 12px #c4415a66;
-  }
+  .service-price { font-family: 'Playfair Display', serif; font-style: italic; font-size: 17px; color: var(--rose-lt); white-space: nowrap; }
+  .check { width: 20px; height: 20px; border-radius: 50%; background: var(--rose); display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; box-shadow: 0 0 12px #c4415a66; }
 
-  /* CALENDAR */
   .calendar-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
   @media (max-width: 600px) { .calendar-wrap { grid-template-columns: 1fr; } }
-
-  .cal-box {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 20px;
-  }
+  .cal-box { background: var(--bg2); border: 1px solid var(--border); padding: 20px; }
   .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .cal-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    font-weight: 400;
-    font-style: italic;
-    color: var(--text);
-  }
-  .cal-nav {
-    background: none;
-    border: 1px solid var(--border2);
-    color: var(--muted);
-    width: 28px; height: 28px;
-    cursor: pointer;
-    font-size: 15px;
-    transition: all 0.2s;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-  }
+  .cal-header h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 400; font-style: italic; color: var(--text); }
+  .cal-nav { background: none; border: 1px solid var(--border2); color: var(--muted); width: 28px; height: 28px; cursor: pointer; font-size: 15px; transition: all 0.2s; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
   .cal-nav:hover { border-color: var(--rose); color: var(--rose-lt); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-  .cal-day-name {
-    text-align: center;
-    font-size: 9px;
-    letter-spacing: 1px;
-    color: var(--dim);
-    text-transform: uppercase;
-    padding: 4px 0 10px;
-  }
-  .cal-day {
-    aspect-ratio: 1;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px;
-    border-radius: 50%;
-    border: 1px solid transparent;
-    transition: all 0.15s;
-    color: var(--dim);
-  }
+  .cal-day-name { text-align: center; font-size: 9px; letter-spacing: 1px; color: var(--dim); text-transform: uppercase; padding: 4px 0 10px; }
+  .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 12px; border-radius: 50%; border: 1px solid transparent; transition: all 0.15s; color: var(--dim); }
   .cal-day.current-month { color: var(--text); cursor: pointer; }
   .cal-day.current-month:hover { background: var(--bg3); border-color: var(--border2); }
   .cal-day.today { border-color: var(--rose-dim); }
   .cal-day.selected { background: var(--rose); color: white; border-color: var(--rose); box-shadow: 0 0 14px #c4415a55; }
 
-  .times-box {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 20px;
-  }
-  .times-label {
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--dim);
-    margin-bottom: 14px;
-  }
+  .times-box { background: var(--bg2); border: 1px solid var(--border); padding: 20px; }
+  .times-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim); margin-bottom: 14px; }
   .times-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-  .time-slot {
-    padding: 10px 8px;
-    border: 1px solid var(--border);
-    background: var(--bg);
-    font-size: 12px;
-    letter-spacing: 0.5px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.15s;
-    color: var(--muted);
-    border-radius: 2px;
-  }
+  .time-slot { padding: 10px 8px; border: 1px solid var(--border); background: var(--bg); font-size: 12px; letter-spacing: 0.5px; text-align: center; cursor: pointer; transition: all 0.15s; color: var(--muted); border-radius: 2px; }
   .time-slot:hover { border-color: var(--border2); color: var(--text); }
-  .time-slot.selected {
-    border-color: var(--rose);
-    background: #200e18;
-    color: var(--rose-lt);
-    box-shadow: 0 0 10px #c4415a22;
-  }
+  .time-slot.selected { border-color: var(--rose); background: #200e18; color: var(--rose-lt); box-shadow: 0 0 10px #c4415a22; }
 
-  /* FORM */
   .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
   .form-field { display: flex; flex-direction: column; gap: 8px; }
   .form-field.full { grid-column: 1 / -1; }
   .form-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
-  .form-input {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    padding: 13px 16px;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-weight: 300;
-    border-radius: 2px;
-  }
+  .form-input { background: var(--bg2); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 13px 16px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; font-weight: 300; border-radius: 2px; }
   .form-input:focus { border-color: var(--rose-dim); box-shadow: 0 0 0 3px #c4415a18; }
   .form-input::placeholder { color: var(--dim); }
   textarea.form-input { resize: vertical; min-height: 90px; }
 
-  /* SUMMARY */
-  .summary-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    padding: 28px;
-    margin-bottom: 24px;
-    position: relative;
-    overflow: hidden;
-  }
-  .summary-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim));
-  }
-  .summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 13px;
-    gap: 16px;
-  }
+  .summary-card { background: var(--bg2); border: 1px solid var(--border); padding: 28px; margin-bottom: 24px; position: relative; overflow: hidden; }
+  .summary-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim)); }
+  .summary-row { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; gap: 16px; }
   .summary-row:last-child { border-bottom: none; }
   .summary-key { color: var(--muted); letter-spacing: 1px; font-size: 11px; text-transform: uppercase; flex-shrink: 0; }
   .summary-val { color: var(--text); text-align: right; }
-  .summary-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 20px;
-    margin-top: 12px;
-    border-top: 1px solid var(--border2);
-  }
+  .summary-total { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; margin-top: 12px; border-top: 1px solid var(--border2); }
   .summary-total-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
   .summary-total-val { font-family: 'Playfair Display', serif; font-size: 26px; font-style: italic; color: var(--rose-lt); }
 
-  /* BUTTONS */
   .btn-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 36px; }
-  .btn {
-    padding: 14px 32px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-weight: 500;
-    border: none;
-    border-radius: 2px;
-  }
-  .btn-primary {
-    background: var(--rose);
-    color: white;
-    box-shadow: 0 4px 20px #c4415a44;
-  }
+  .btn { padding: 14px 32px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; border: none; border-radius: 2px; }
+  .btn-primary { background: var(--rose); color: white; box-shadow: 0 4px 20px #c4415a44; }
   .btn-primary:hover { background: #d4506a; box-shadow: 0 4px 28px #c4415a66; transform: translateY(-1px); }
   .btn-primary:disabled { background: var(--border2); color: var(--dim); cursor: not-allowed; box-shadow: none; transform: none; }
-  .btn-ghost {
-    background: none;
-    border: 1px solid var(--border2);
-    color: var(--muted);
-  }
+  .btn-ghost { background: none; border: 1px solid var(--border2); color: var(--muted); }
   .btn-ghost:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
 
-  /* SUCCESS */
   .success-wrap { text-align: center; padding: 72px 24px; }
-  .success-icon {
-    font-size: 48px;
-    color: var(--rose);
-    margin-bottom: 28px;
-    display: block;
-    text-shadow: 0 0 40px #c4415a88;
-    animation: pulse 2s ease-in-out infinite;
-  }
+  .success-icon { font-size: 48px; color: var(--rose); margin-bottom: 28px; display: block; text-shadow: 0 0 40px #c4415a88; animation: pulse 2s ease-in-out infinite; }
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.8;transform:scale(1.05)} }
-  .success-wrap h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 40px;
-    font-style: italic;
-    font-weight: 400;
-    color: var(--text);
-    margin-bottom: 14px;
-  }
+  .success-wrap h2 { font-family: 'Playfair Display', serif; font-size: 40px; font-style: italic; font-weight: 400; color: var(--text); margin-bottom: 14px; }
   .success-wrap p { font-size: 14px; color: var(--muted); line-height: 1.8; letter-spacing: 0.3px; }
-  .success-detail {
-    display: inline-block;
-    margin-top: 36px;
-    padding: 20px 40px;
-    border: 1px solid var(--border2);
-    background: var(--bg2);
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: var(--rose-lt);
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-  }
+  .success-detail { display: inline-block; margin-top: 36px; padding: 20px 40px; border: 1px solid var(--border2); background: var(--bg2); font-size: 13px; letter-spacing: 1px; color: var(--rose-lt); font-family: 'Playfair Display', serif; font-style: italic; }
   .error-msg { margin-top: 14px; font-size: 12px; color: #e87a7a; letter-spacing: 1px; text-align: center; }
-  /* POLICY MODAL */
-  .modal-overlay {
-    position: fixed; inset: 0; z-index: 100;
-    background: rgba(15, 10, 12, 0.92);
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
-    animation: fadeIn 0.2s ease;
-  }
-  .modal {
-    background: var(--bg2);
-    border: 1px solid var(--border2);
-    max-width: 560px; width: 100%;
-    max-height: 85vh;
-    overflow-y: auto;
-    position: relative;
-    animation: fadeUp 0.3s ease;
-  }
-  .modal::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim));
-  }
-  .modal-header {
-    padding: 28px 28px 16px;
-    border-bottom: 1px solid var(--border);
-    position: sticky; top: 0;
-    background: var(--bg2);
-    z-index: 1;
-  }
-  .modal-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px; font-style: italic; font-weight: 400;
-    color: var(--text); margin-bottom: 4px;
-  }
+
+  .modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(15, 10, 12, 0.92); display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .modal { background: var(--bg2); border: 1px solid var(--border2); max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto; position: relative; }
+  .modal::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim)); }
+  .modal-header { padding: 28px 28px 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: var(--bg2); z-index: 1; }
+  .modal-header h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; font-weight: 400; color: var(--text); margin-bottom: 4px; }
   .modal-header p { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
   .modal-body { padding: 20px 28px 28px; }
   .policy-section { margin-bottom: 24px; }
   .policy-section:last-child { margin-bottom: 0; }
-  .policy-section h3 {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--rose); margin-bottom: 10px;
-    display: flex; align-items: center; gap: 8px;
-  }
+  .policy-section h3 { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--rose); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
   .policy-section h3::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-  .policy-item {
-    display: flex; gap: 10px; margin-bottom: 8px;
-    font-size: 13px; color: var(--muted); line-height: 1.65;
-  }
+  .policy-item { display: flex; gap: 10px; margin-bottom: 8px; font-size: 13px; color: var(--muted); line-height: 1.65; }
   .policy-item:last-child { margin-bottom: 0; }
   .policy-dot { color: var(--rose); flex-shrink: 0; margin-top: 2px; }
-  .modal-footer {
-    padding: 20px 28px;
-    border-top: 1px solid var(--border);
-    display: flex; flex-direction: column; gap: 10px;
-    position: sticky; bottom: 0; background: var(--bg2);
-  }
-  .modal-agree {
-    display: flex; align-items: flex-start; gap: 10px;
-    font-size: 12px; color: var(--muted); cursor: pointer;
-    margin-bottom: 4px;
-  }
+  .modal-footer { padding: 20px 28px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px; position: sticky; bottom: 0; background: var(--bg2); }
+  .modal-agree { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: var(--muted); cursor: pointer; margin-bottom: 4px; }
   .modal-agree input { accent-color: var(--rose); margin-top: 2px; flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; }
   .modal-buttons { display: flex; gap: 10px; }
-
-
   .no-date-msg { font-size: 12px; color: var(--dim); letter-spacing: 1px; margin-top: 10px; }
 `;
 
@@ -653,7 +276,6 @@ export default function BeautyBooking() {
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
-  // Load booked slots, blocked dates, and availability on mount
   useEffect(() => {
     getBookedSlots().then(slots => setBookedSlots(slots));
     fetchBlockedDates().then(dates => setBlockedDates(dates));
@@ -693,7 +315,7 @@ export default function BeautyBooking() {
   }
 
   function isDayFullyBooked(year, month, day) {
-    const times = getAvailableTimes(year, month, day);
+    const times = getAvailableTimesFromData(year, month, day);
     return times.length > 0 && times.every(t => isSlotBooked(year, month, day, t));
   }
 
@@ -715,7 +337,6 @@ export default function BeautyBooking() {
   ];
 
   function handleConfirm() {
-    // Store booking in localStorage — only saved to Supabase after deposit paid
     const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
     localStorage.setItem("bookingService", selectedServices.map(s => s.name).join(', '));
     localStorage.setItem("bookingDate", bookingDate);
@@ -728,8 +349,6 @@ export default function BeautyBooking() {
     localStorage.setItem("bookingNotes", form.notes || "");
     setStep(4);
   }
-
-
 
   if (submitted) {
     return (
@@ -746,9 +365,6 @@ export default function BeautyBooking() {
               <span className="success-icon">✦</span>
               <h2>You're All Set!</h2>
               <p>Your appointment has been booked.<br />A confirmation has been sent to {form.email}.</p>
-              <div className="success-detail">
-                {selectedService?.name} · {MONTHS[calMonth]} {selectedDay}, {calYear} · {selectedTime}
-              </div>
             </div>
           </div>
         </div>
@@ -765,7 +381,9 @@ export default function BeautyBooking() {
           <h1><span>Acrylic</span> Faerie</h1>
           <p className="header-sub">San Antonio · Home Based Nail Technician</p>
           <div className="header-divider">Book Your Appointment</div>
-          <div style={{marginTop:18,display:"flex",justifyContent:"center"}}><a href="/portfolio" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",transition:"all 0.2s"}}>✦ View Gallery ✦</a></div>
+          <div style={{marginTop:18,display:"flex",justifyContent:"center"}}>
+            <a href="/portfolio" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18"}}>✦ View Gallery ✦</a>
+          </div>
         </div>
 
         <div className="steps">
@@ -845,7 +463,7 @@ export default function BeautyBooking() {
                         const booked = isSlotBooked(calYear, calMonth, selectedDay, t);
                         return (
                           <div key={t}
-                            className={`time-slot ${selectedTime === t ? "selected" : ""} ${booked ? "booked" : ""}`}
+                            className={`time-slot ${selectedTime === t ? "selected" : ""}`}
                             onClick={() => !booked && setSelectedTime(t)}
                             style={{ opacity: booked ? 0.3 : 1, cursor: booked ? "not-allowed" : "pointer", textDecoration: booked ? "line-through" : "none" }}
                           >{t}{booked ? " ✗" : ""}</div>
@@ -910,14 +528,11 @@ export default function BeautyBooking() {
                 </div>
               </div>
               {sendError && <p className="error-msg">Something went wrong. Please try again.</p>}
-
               <div style={{background:"#200e18",border:"1px solid var(--rose-dim)",padding:"12px 16px",marginTop:16,borderRadius:2}}>
                 <p style={{fontSize:12,color:"var(--rose-lt)",letterSpacing:0.5,lineHeight:1.7}}>
                   ⚠️ After reviewing, you will be directed to pay a <strong>$10 deposit via Stripe</strong>. Your appointment is only confirmed once payment is completed.
                 </p>
               </div>
-
-              {/* INLINE POLICY */}
               <div style={{marginTop:24, background:"var(--bg2)", border:"1px solid var(--border)", padding:"20px 24px"}}>
                 <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:14}}>Studio Policies</div>
                 <div style={{fontSize:12,color:"var(--muted)",lineHeight:1.8,display:"flex",flexDirection:"column",gap:8}}>
@@ -934,7 +549,6 @@ export default function BeautyBooking() {
               </div>
             </>
           )}
-
 
           {step === 4 && (
             <>
@@ -979,59 +593,6 @@ export default function BeautyBooking() {
               : null}
           </div>
         </div>
-
-        {/* POLICY MODAL */}
-        {showPolicy && (
-          <div className="modal-overlay" onClick={(e) => { if (e.target.className === 'modal-overlay') setShowPolicy(false); }}>
-            <div className="modal">
-              <div className="modal-header">
-                <h2>Studio Policies</h2>
-                <p>Please read and agree before booking</p>
-              </div>
-              <div className="modal-body">
-
-                <div className="policy-section">
-                  <h3>Deposits & Cancellations</h3>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>A non-refundable $10 deposit is required to secure your appointment.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Cancellations must be made at least <strong style={{color:"var(--text)"}}>24 hours in advance</strong>. Cancellations made less than 24 hours before your appointment will forfeit the deposit.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Your deposit is <strong style={{color:"var(--text)"}}>transferable to a reschedule</strong> if notice is given at least 24 hours in advance.</span></div>
-                </div>
-
-                <div className="policy-section">
-                  <h3>Late Arrivals</h3>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>There is a <strong style={{color:"var(--text)"}}>10-minute grace period</strong> for late arrivals.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Arrivals more than 10 minutes late will be subject to a <strong style={{color:"var(--text)"}}>$10 late fee</strong>.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Significantly late arrivals may result in a shortened service or cancelled appointment at the artist's discretion.</span></div>
-                </div>
-
-                <div className="policy-section">
-                  <h3>Refund Policy</h3>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span><strong style={{color:"var(--text)"}}>No refunds</strong> are offered on any services rendered.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>If you are unhappy with your service, please reach out within 48 hours and we will work to make it right.</span></div>
-                </div>
-
-                <div className="policy-section">
-                  <h3>Health & Safety</h3>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Services will not be performed on <strong style={{color:"var(--text)"}}>damaged, infected, or compromised nail beds</strong>. Please reschedule if this applies to you.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span><strong style={{color:"var(--text)"}}>Foreign soak offs are not offered.</strong> Only sets applied by Acrylic Faerie will be soaked off.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Please arrive with <strong style={{color:"var(--text)"}}>clean, bare nails</strong> — no polish, gel, or product of any kind.</span></div>
-                  <div className="policy-item"><span className="policy-dot">✦</span><span>Please inform us of any allergies or skin sensitivities prior to your appointment.</span></div>
-                </div>
-
-              </div>
-              <div className="modal-footer">
-                <label className="modal-agree">
-                  <input type="checkbox" checked={agreedToPolicy} onChange={e => setAgreedToPolicy(e.target.checked)} />
-                  I have read and agree to all studio policies listed above.
-                </label>
-                <div className="modal-buttons">
-                  <button className="btn btn-ghost" style={{flex:1}} onClick={() => { setShowPolicy(false); setAgreedToPolicy(false); }}>Cancel</button>
-                  <button className="btn btn-primary" style={{flex:2}} disabled={!agreedToPolicy} onClick={() => { setShowPolicy(false); handleConfirm(); }}>Agree & Proceed ✦</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
