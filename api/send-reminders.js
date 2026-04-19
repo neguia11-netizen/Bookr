@@ -8,11 +8,15 @@ const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
 async function sendReminderEmail(booking) {
   const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "origin": "https://acrylicfaerie.com",
+    },
     body: JSON.stringify({
       service_id: EMAILJS_SERVICE_ID,
       template_id: EMAILJS_TEMPLATE_ID,
       user_id: EMAILJS_PUBLIC_KEY,
+      accessToken: EMAILJS_PUBLIC_KEY,
       template_params: {
         client_name: booking.client_name,
         client_email: booking.client_email,
@@ -27,6 +31,10 @@ async function sendReminderEmail(booking) {
       },
     }),
   });
+  if (!res.ok) {
+    const err = await res.text();
+    console.error("EmailJS error:", err);
+  }
   return res.ok;
 }
 
