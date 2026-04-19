@@ -961,11 +961,9 @@ export default function BeautyBooking() {
                     Please complete payment below to secure your appointment.
                   </p>
                 </div>
-                <a href={buildStripeLink()} target="_blank" rel="noopener noreferrer" style={{display:"inline-block"}}>
-                  <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}}>
-                    Pay $10 Deposit ✦
-                  </button>
-                </a>
+                <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}} onClick={() => { window.location.href = STRIPE_DEPOSIT_LINK; }}>
+                  Pay $10 Deposit ✦
+                </button>
                 <p style={{fontSize:11,color:"var(--dim)",marginTop:16,letterSpacing:1}}>
                   Secured by Stripe · Your card info is never stored
                 </p>
