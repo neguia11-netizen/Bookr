@@ -719,20 +719,6 @@ export default function BeautyBooking() {
     setStep(4);
   }
 
-  function buildStripeLink() {
-    const params = new URLSearchParams({
-      service: selectedService?.name || "",
-      date: `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`,
-      time: selectedTime || "",
-      duration: formatDuration(selectedService?.duration),
-      price: selectedService?.priceLabel || "",
-      name: `${form.first} ${form.last}`,
-      email: form.email,
-      phone: form.phone,
-      notes: form.notes || "",
-    });
-    return `${STRIPE_DEPOSIT_LINK}?${params.toString()}`;
-  }
 
 
   if (submitted) {
@@ -897,7 +883,7 @@ export default function BeautyBooking() {
               <h2 className="section-title">Review & Confirm</h2>
               <p className="section-sub">Please review your booking details below</p>
               <div className="summary-card">
-                {selectedServices.map(s => (
+                {(selectedServices || []).map(s => (
                   <div key={s.id} className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{s.name}</span></div>
                 ))}
                 <div className="summary-row"><span className="summary-key">Total Duration</span><span className="summary-val">{formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0))}</span></div>
@@ -944,7 +930,7 @@ export default function BeautyBooking() {
               <h2 className="section-title">Pay Your Deposit</h2>
               <p className="section-sub">$10 deposit required to secure your appointment</p>
               <div className="summary-card">
-                {selectedServices.map(s => (
+                {(selectedServices || []).map(s => (
                   <div key={s.id} className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{s.name}</span></div>
                 ))}
                 <div className="summary-row"><span className="summary-key">Date</span><span className="summary-val">{MONTHS[calMonth]} {selectedDay}, {calYear}</span></div>
