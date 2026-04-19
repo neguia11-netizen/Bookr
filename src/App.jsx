@@ -755,7 +755,7 @@ export default function BeautyBooking() {
           <h1><span>Acrylic</span> Faerie</h1>
           <p className="header-sub">San Antonio · Home Based Nail Technician</p>
           <div className="header-divider">Book Your Appointment</div>
-          <div style={{marginTop:14}}><a href="/portfolio" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-dim)",textDecoration:"none"}}>View Gallery ✦</a></div>
+          <div style={{marginTop:18,display:"flex",justifyContent:"center"}}><a href="/portfolio" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",transition:"all 0.2s"}}>✦ View Gallery ✦</a></div>
         </div>
 
         <div className="steps">
