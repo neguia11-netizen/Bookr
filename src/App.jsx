@@ -658,7 +658,7 @@ const styles = `
 
 export default function BeautyBooking() {
   const [step, setStep] = useState(0);
-  const [selectedService, setSelectedService] = useState(null);
+  const [selectedServices, setSelectedServices] = useState([]);
   const today = new Date();
   const [calYear, setCalYear] = useState(today.getFullYear());
   const [calMonth, setCalMonth] = useState(today.getMonth());
@@ -698,7 +698,7 @@ export default function BeautyBooking() {
   const isPast = (d) => new Date(calYear, calMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
   const canProceed = [
-    !!selectedService,
+    selectedServices.length > 0,
     !!selectedDay && !!selectedTime,
     !!(form.first && form.last && form.email && form.phone),
     true,
@@ -707,11 +707,11 @@ export default function BeautyBooking() {
   function handleConfirm() {
     // Store booking in localStorage — only saved to Supabase after deposit paid
     const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
-    localStorage.setItem("bookingService", selectedService.name);
+    localStorage.setItem("bookingService", selectedServices.map(s => s.name).join(', '));
     localStorage.setItem("bookingDate", bookingDate);
     localStorage.setItem("bookingTime", selectedTime);
-    localStorage.setItem("bookingDuration", formatDuration(selectedService.duration));
-    localStorage.setItem("bookingPrice", selectedService.priceLabel);
+    localStorage.setItem("bookingDuration", formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0)));
+    localStorage.setItem("bookingPrice", selectedServices.some(s => !s.price) ? 'Price varies' : '$' + selectedServices.reduce((acc, s) => acc + (s.price || 0), 0).toFixed(2));
     localStorage.setItem("bookingName", `${form.first} ${form.last}`);
     localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingPhone", form.phone);
@@ -785,13 +785,19 @@ export default function BeautyBooking() {
           {step === 0 && (
             <>
               <h2 className="section-title">Choose a Service</h2>
-              <p className="section-sub">Select one service to continue</p>
+              <p className="section-sub">Select one or more services to continue</p>
               {categories.map(cat => (
                 <div key={cat}>
                   <div className="category-label">{cat}</div>
                   <div className="services-grid">
                     {SERVICES.filter(s => s.category === cat).map(s => (
-                      <div key={s.id} className={`service-card ${selectedService?.id === s.id ? "selected" : ""}`} onClick={() => setSelectedService(s)}>
+                      <div key={s.id} className={`service-card ${selectedServices.find(x => x.id === s.id) ? "selected" : ""}`} onClick={() => {
+                        setSelectedServices(prev =>
+                          prev.find(x => x.id === s.id)
+                            ? prev.filter(x => x.id !== s.id)
+                            : [...prev, s]
+                        );
+                      }}>
                         <div className="service-left">
                           <div className="service-icon">{s.icon}</div>
                           <div className="service-info">
@@ -802,7 +808,7 @@ export default function BeautyBooking() {
                         </div>
                         <div className="service-right">
                           <div className="service-price">{s.priceLabel}</div>
-                          {selectedService?.id === s.id && <div className="check">✓</div>}
+                          {selectedServices.find(x => x.id === s.id) && <div className="check">✓</div>}
                         </div>
                       </div>
                     ))}
@@ -815,7 +821,7 @@ export default function BeautyBooking() {
           {step === 1 && (
             <>
               <h2 className="section-title">Pick a Date & Time</h2>
-              <p className="section-sub">{selectedService?.name} · {formatDuration(selectedService?.duration)}</p>
+              <p className="section-sub">{selectedServices.length} service{selectedServices.length !== 1 ? "s" : ""} selected · {formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0))} total</p>
               <div className="calendar-wrap">
                 <div className="cal-box">
                   <div className="cal-header">
@@ -891,8 +897,10 @@ export default function BeautyBooking() {
               <h2 className="section-title">Review & Confirm</h2>
               <p className="section-sub">Please review your booking details below</p>
               <div className="summary-card">
-                <div className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{selectedService?.name}</span></div>
-                <div className="summary-row"><span className="summary-key">Duration</span><span className="summary-val">{formatDuration(selectedService?.duration)}</span></div>
+                {selectedServices.map(s => (
+                  <div key={s.id} className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{s.name}</span></div>
+                ))}
+                <div className="summary-row"><span className="summary-key">Total Duration</span><span className="summary-val">{formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0))}</span></div>
                 <div className="summary-row"><span className="summary-key">Date</span><span className="summary-val">{MONTHS[calMonth]} {selectedDay}, {calYear}</span></div>
                 <div className="summary-row"><span className="summary-key">Time</span><span className="summary-val">{selectedTime}</span></div>
                 <div className="summary-row"><span className="summary-key">Name</span><span className="summary-val">{form.first} {form.last}</span></div>
@@ -901,7 +909,7 @@ export default function BeautyBooking() {
                 {form.notes && <div className="summary-row"><span className="summary-key">Notes</span><span className="summary-val">{form.notes}</span></div>}
                 <div className="summary-total">
                   <span className="summary-total-label">Estimated Total</span>
-                  <span className="summary-total-val">{selectedService?.priceLabel}</span>
+                  <span className="summary-total-val">{selectedServices.some(s => !s.price) ? "Price varies" : "$" + selectedServices.reduce((acc, s) => acc + (s.price || 0), 0).toFixed(2)}</span>
                 </div>
               </div>
               {sendError && <p className="error-msg">Something went wrong. Please try again.</p>}
@@ -930,7 +938,9 @@ export default function BeautyBooking() {
               <h2 className="section-title">Pay Your Deposit</h2>
               <p className="section-sub">$10 deposit required to secure your appointment</p>
               <div className="summary-card">
-                <div className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{selectedService?.name}</span></div>
+                {selectedServices.map(s => (
+                  <div key={s.id} className="summary-row"><span className="summary-key">Service</span><span className="summary-val">{s.name}</span></div>
+                ))}
                 <div className="summary-row"><span className="summary-key">Date</span><span className="summary-val">{MONTHS[calMonth]} {selectedDay}, {calYear}</span></div>
                 <div className="summary-row"><span className="summary-key">Time</span><span className="summary-val">{selectedTime}</span></div>
                 <div className="summary-total">
