@@ -1,4 +1,3 @@
-
 const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
@@ -46,8 +45,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get tomorrow's date string
-    const tomorrow = new Date();
+    // Get tomorrow's date in CST/CDT (San Antonio, TX)
+    const now = new Date(new Date().toLocaleString("en-US", { timeZone: "America/Chicago" }));
+    const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
     const tomorrowStr = `${months[tomorrow.getMonth()]} ${tomorrow.getDate()}, ${tomorrow.getFullYear()}`;
@@ -65,8 +65,9 @@ export default async function handler(req, res) {
 
     const bookings = await bookingsRes.json();
 
+    const debugNow = new Date().toLocaleString("en-US", { timeZone: "America/Chicago" });
     if (!bookings.length) {
-      return res.status(200).json({ message: `No appointments tomorrow (${tomorrowStr})`, sent: 0 });
+      return res.status(200).json({ message: `No appointments tomorrow (${tomorrowStr})`, sent: 0, debug_now_cst: debugNow, debug_tomorrow: tomorrowStr });
     }
 
     // Send reminder to each client
