@@ -256,6 +256,22 @@ const styles = `
   .modal-agree input { accent-color: var(--rose); margin-top: 2px; flex-shrink: 0; width: 14px; height: 14px; cursor: pointer; }
   .modal-buttons { display: flex; gap: 10px; }
   .no-date-msg { font-size: 12px; color: var(--dim); letter-spacing: 1px; margin-top: 10px; }
+  .inspo-upload { margin-top: 16px; }
+  .inspo-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 8px; }
+  .inspo-drop {
+    border: 1px dashed var(--border2); background: var(--bg);
+    padding: 20px; text-align: center; cursor: pointer;
+    transition: all 0.2s; position: relative; border-radius: 2px;
+  }
+  .inspo-drop:hover { border-color: var(--rose-dim); background: var(--bg3); }
+  .inspo-drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .inspo-drop-text { font-size: 12px; color: var(--dim); letter-spacing: 1px; }
+  .inspo-drop-text span { color: var(--rose-dim); }
+  .inspo-preview { margin-top: 10px; position: relative; display: inline-block; }
+  .inspo-preview img { max-width: 100%; max-height: 200px; object-fit: cover; border: 1px solid var(--border2); display: block; }
+  .inspo-remove { position: absolute; top: -8px; right: -8px; width: 22px; height: 22px; border-radius: 50%; background: var(--rose); border: none; color: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .inspo-uploading { font-size: 11px; color: var(--muted); letter-spacing: 1px; margin-top: 8px; }
+
   .footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; background: var(--bg2); position: relative; z-index: 1; }
   .footer-sparkle { font-size: 11px; letter-spacing: 6px; color: var(--rose); margin-bottom: 16px; display: block; }
   .footer-title { font-family: 'Playfair Display', serif; font-size: 14px; font-style: italic; color: var(--muted); margin-bottom: 20px; letter-spacing: 2px; }
@@ -287,12 +303,40 @@ export default function BeautyBooking() {
   const [availabilityData, setAvailabilityData] = useState([]);
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
+  const [inspoFile, setInspoFile] = useState(null);
+  const [inspoPreview, setInspoPreview] = useState(null);
+  const [inspoUploading, setInspoUploading] = useState(false);
+  const [inspoUrl, setInspoUrl] = useState("");
 
   useEffect(() => {
     getBookedSlots().then(slots => setBookedSlots(slots));
     fetchBlockedDates().then(dates => setBlockedDates(dates));
     fetchAvailability().then(avail => setAvailabilityData(avail));
   }, []);
+
+  async function handleInspoUpload(file) {
+    if (!file) return;
+    setInspoFile(file);
+    setInspoPreview(URL.createObjectURL(file));
+    setInspoUploading(true);
+    try {
+      const fileName = `inspo-${Date.now()}-${file.name.replace(/ /g, '-')}`;
+      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/inspo/${fileName}`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": file.type,
+        },
+        body: file,
+      });
+      if (res.ok) {
+        const url = `${SUPABASE_URL}/storage/v1/object/public/inspo/${fileName}`;
+        setInspoUrl(url);
+      }
+    } catch { }
+    finally { setInspoUploading(false); }
+  }
 
   function getAvailableTimesFromData(year, month, day) {
     const dateStr = `${MONTHS[month]} ${day}, ${year}`;
@@ -359,6 +403,7 @@ export default function BeautyBooking() {
     localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingPhone", form.phone);
     localStorage.setItem("bookingNotes", form.notes || "");
+    localStorage.setItem("bookingInspo", inspoUrl || "");
     setStep(4);
   }
 
@@ -513,7 +558,24 @@ export default function BeautyBooking() {
                 </div>
                 <div className="form-field full">
                   <label className="form-label">Notes (optional)</label>
-                  <textarea className="form-input" placeholder="Any special requests, inspo pics, or allergies..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+                  <textarea className="form-input" placeholder="Any special requests or allergies..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
+                </div>
+                <div className="form-field full inspo-upload">
+                  <label className="inspo-label">Inspo Photo (optional)</label>
+                  {!inspoPreview ? (
+                    <div className="inspo-drop">
+                      <input type="file" accept="image/*" onChange={e => e.target.files[0] && handleInspoUpload(e.target.files[0])} />
+                      <p className="inspo-drop-text">Tap to upload · <span>Browse photos</span></p>
+                      <p style={{fontSize:11,color:"var(--dim)",marginTop:4}}>JPG, PNG, HEIC up to 10MB</p>
+                    </div>
+                  ) : (
+                    <div className="inspo-preview">
+                      <img src={inspoPreview} alt="Inspo preview" />
+                      <button className="inspo-remove" onClick={() => { setInspoFile(null); setInspoPreview(null); setInspoUrl(""); }}>✕</button>
+                    </div>
+                  )}
+                  {inspoUploading && <p className="inspo-uploading">Uploading photo...</p>}
+                  {inspoUrl && !inspoUploading && <p style={{fontSize:11,color:"var(--green,#4a9a6a)",marginTop:6,letterSpacing:1}}>✓ Photo uploaded</p>}
                 </div>
               </div>
             </>
