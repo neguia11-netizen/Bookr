@@ -114,28 +114,29 @@ const styles = `
   .footer-note { margin-top:28px; font-size:11px; color:var(--dim); letter-spacing:1px; animation:fadeUp 0.6s ease 0.9s both; }
   .footer-note a { color:var(--rose-dim); text-decoration:none; }
   .footer-note a:hover { color:var(--rose-lt); }
+  .inspo-saved { margin-bottom: 20px; animation:fadeUp 0.6s ease 0.65s both; }
+  .inspo-saved p { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--rose); margin-bottom:8px; }
+  .inspo-saved img { max-width:100%; max-height:160px; object-fit:cover; border:1px solid var(--border2); border-radius:2px; }
 `;
 
 export default function Success() {
   const [booking, setBooking] = useState(null);
 
   useEffect(() => {
-    const id      = localStorage.getItem("bookingId");
-    const email   = localStorage.getItem("bookingEmail");
-    const service = localStorage.getItem("bookingService");
-    const date    = localStorage.getItem("bookingDate");
-    const time    = localStorage.getItem("bookingTime");
-    const duration= localStorage.getItem("bookingDuration");
-    const price   = localStorage.getItem("bookingPrice");
-    const name    = localStorage.getItem("bookingName");
-    const phone   = localStorage.getItem("bookingPhone");
-
-    const notes = localStorage.getItem("bookingNotes") || "";
+    const email    = localStorage.getItem("bookingEmail");
+    const service  = localStorage.getItem("bookingService");
+    const date     = localStorage.getItem("bookingDate");
+    const time     = localStorage.getItem("bookingTime");
+    const duration = localStorage.getItem("bookingDuration");
+    const price    = localStorage.getItem("bookingPrice");
+    const name     = localStorage.getItem("bookingName");
+    const phone    = localStorage.getItem("bookingPhone");
+    const notes    = localStorage.getItem("bookingNotes") || "";
+    const inspoUrl = localStorage.getItem("bookingInspo") || "";
 
     if (service && date && time) {
-      setBooking({ service, date, time, name, email });
+      setBooking({ service, date, time, name, email, inspoUrl });
 
-      // Save booking to Supabase as paid + send emails simultaneously
       Promise.allSettled([
         saveBooking({
           service, date, time, duration, price,
@@ -143,6 +144,7 @@ export default function Success() {
           client_email: email,
           client_phone: phone,
           notes,
+          inspo_url: inspoUrl || null,
         }),
         sendEmail({
           service, date, time, duration, price,
@@ -153,7 +155,6 @@ export default function Success() {
         }),
       ]);
 
-      // Clear localStorage so refreshing doesn't re-trigger
       localStorage.clear();
     }
   }, []);
@@ -185,6 +186,13 @@ export default function Success() {
             </>)}
             <div className="detail-row"><span className="detail-key">Deposit Paid</span><span className="detail-val">$10.00 ✦</span></div>
           </div>
+
+          {booking?.inspoUrl && (
+            <div className="inspo-saved">
+              <p>Your Inspo Photo</p>
+              <img src={booking.inspoUrl} alt="Your inspo" />
+            </div>
+          )}
 
           <div className="divider">What's Next</div>
 
