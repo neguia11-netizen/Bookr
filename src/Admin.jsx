@@ -12,10 +12,7 @@ function getFirstDay(y, m) { return new Date(y, m, 1).getDay(); }
 
 async function fetchBookings() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?select=*&order=date.asc,time.asc`, {
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    }
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
   });
   if (!res.ok) throw new Error("Failed to fetch");
   return await res.json();
@@ -24,14 +21,10 @@ async function fetchBookings() {
 async function deleteBooking(id) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${id}`, {
     method: "DELETE",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-    }
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
   });
   if (!res.ok) throw new Error("Failed to delete");
 }
-
 
 async function fetchBlockedDates() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates?select=*`, {
@@ -44,12 +37,7 @@ async function fetchBlockedDates() {
 async function blockDate(date, reason) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/blocked_dates`, {
     method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=minimal",
-    },
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=minimal" },
     body: JSON.stringify({ date, reason }),
   });
   if (!res.ok) throw new Error("Failed to block date");
@@ -63,7 +51,6 @@ async function unblockDate(id) {
   if (!res.ok) throw new Error("Failed to unblock date");
 }
 
-
 async function fetchAvailability() {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/availability?select=*&order=date.asc,time.asc`, {
     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
@@ -75,12 +62,7 @@ async function fetchAvailability() {
 async function addAvailability(date, time) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/availability`, {
     method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=minimal",
-    },
+    headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=minimal" },
     body: JSON.stringify({ date, time }),
   });
   if (!res.ok) throw new Error("Failed to add availability");
@@ -108,16 +90,8 @@ const styles = `
   body { background: var(--bg); }
   .page { min-height: 100vh; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-weight: 300; }
 
-  /* LOGIN */
-  .login-wrap {
-    min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
-    background: radial-gradient(ellipse at 50% 0%, #2a0e1a 0%, var(--bg) 60%);
-  }
-  .login-card {
-    background: var(--bg2); border: 1px solid var(--border2);
-    padding: 40px 36px; max-width: 360px; width: 100%;
-    position: relative;
-  }
+  .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: radial-gradient(ellipse at 50% 0%, #2a0e1a 0%, var(--bg) 60%); }
+  .login-card { background: var(--bg2); border: 1px solid var(--border2); padding: 40px 36px; max-width: 360px; width: 100%; position: relative; }
   .login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim)); }
   .login-sparkle { font-size: 13px; letter-spacing: 6px; color: var(--rose); margin-bottom: 20px; display: block; text-align: center; }
   .login-title { font-family: 'Playfair Display', serif; font-size: 26px; font-style: italic; text-align: center; margin-bottom: 6px; }
@@ -126,30 +100,30 @@ const styles = `
   .login-input { width: 100%; background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; margin-bottom: 20px; }
   .login-input:focus { border-color: var(--rose-dim); }
   .login-error { font-size: 12px; color: #e87a7a; text-align: center; margin-bottom: 14px; }
+
   .btn { padding: 13px 32px; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; font-weight: 500; border: none; border-radius: 2px; width: 100%; }
   .btn-primary { background: var(--rose); color: white; box-shadow: 0 4px 20px #c4415a44; }
   .btn-primary:hover { background: #d4506a; }
+  .btn-primary:disabled { background: var(--border2); color: var(--dim); cursor: not-allowed; }
   .btn-ghost { background: none; border: 1px solid var(--border2); color: var(--muted); width: auto; padding: 8px 20px; font-size: 10px; }
   .btn-ghost:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
+  .btn-sm { padding: 8px 18px; font-size: 10px; letter-spacing: 2px; width: auto; }
   .btn-danger { background: none; border: 1px solid #7a2828; color: #e87a7a; font-size: 10px; letter-spacing: 1px; padding: 6px 14px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; border-radius: 2px; }
   .btn-danger:hover { background: #2a0e0e; }
 
-  /* HEADER */
   .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 28px; border-bottom: 1px solid var(--border); background: var(--bg2); flex-wrap: wrap; gap: 12px; }
   .header-left h1 { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; }
   .header-left h1 span { color: var(--rose-lt); }
   .header-left p { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-top: 2px; }
-  .header-right { display: flex; align-items: center; gap: 12px; }
+  .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
   .stats { display: flex; gap: 16px; }
   .stat { text-align: center; }
   .stat-num { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--rose-lt); }
   .stat-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); }
 
-  /* MAIN LAYOUT */
-  .main { display: grid; grid-template-columns: 1fr 340px; gap: 0; min-height: calc(100vh - 70px); }
+  .main { display: grid; grid-template-columns: 1fr 360px; gap: 0; min-height: calc(100vh - 70px); }
   @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
 
-  /* CALENDAR */
   .cal-panel { padding: 24px; border-right: 1px solid var(--border); }
   .cal-nav-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
   .cal-nav-row h2 { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; }
@@ -157,12 +131,7 @@ const styles = `
   .cal-nav-btn:hover { border-color: var(--rose); color: var(--rose-lt); }
   .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
   .cal-day-name { text-align: center; font-size: 9px; letter-spacing: 2px; color: var(--dim); text-transform: uppercase; padding: 6px 0 12px; }
-  .cal-day {
-    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-size: 13px; border-radius: 4px; border: 1px solid transparent;
-    cursor: pointer; transition: all 0.15s; color: var(--dim); position: relative;
-    gap: 3px;
-  }
+  .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; border-radius: 4px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s; color: var(--dim); position: relative; gap: 3px; }
   .cal-day.current { color: var(--text); }
   .cal-day.today { border-color: var(--rose-dim); }
   .cal-day.has-booking { background: #200e18; border-color: var(--rose-dim); color: var(--rose-lt); }
@@ -173,24 +142,17 @@ const styles = `
   .booking-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--rose); }
   .booking-dot.paid { background: var(--green); }
 
-  /* SIDEBAR */
-  .sidebar { background: var(--bg2); border-left: 1px solid var(--border); }
+  .sidebar { background: var(--bg2); border-left: 1px solid var(--border); overflow-y: auto; }
   .sidebar-header { padding: 18px 20px; border-bottom: 1px solid var(--border); }
   .sidebar-header h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; }
   .sidebar-header p { font-size: 11px; color: var(--dim); margin-top: 2px; letter-spacing: 1px; }
   .sidebar-empty { padding: 40px 20px; text-align: center; color: var(--dim); font-size: 13px; letter-spacing: 1px; }
 
-  .booking-card {
-    padding: 16px 20px; border-bottom: 1px solid var(--border);
-    transition: background 0.15s;
-  }
+  .booking-card { padding: 16px 20px; border-bottom: 1px solid var(--border); transition: background 0.15s; }
   .booking-card:hover { background: var(--bg3); }
   .booking-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
   .booking-time { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; color: var(--rose-lt); }
-  .booking-status {
-    font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-    padding: 3px 8px; border-radius: 20px;
-  }
+  .booking-status { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; padding: 3px 8px; border-radius: 20px; }
   .booking-status.paid { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
   .booking-status.pending { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
   .booking-service { font-size: 13px; color: var(--text); margin-bottom: 8px; font-weight: 400; }
@@ -198,7 +160,17 @@ const styles = `
   .booking-info span { display: block; }
   .booking-actions { margin-top: 12px; display: flex; justify-content: flex-end; }
 
-  /* ALL BOOKINGS LIST */
+  .inspo-section { margin-top: 12px; }
+  .inspo-section-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--rose); margin-bottom: 8px; }
+  .inspo-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .inspo-thumb { width: 72px; height: 72px; object-fit: cover; border: 1px solid var(--border2); border-radius: 2px; cursor: pointer; transition: border-color 0.2s; }
+  .inspo-thumb:hover { border-color: var(--rose); }
+
+  .inspo-lightbox { position: fixed; inset: 0; z-index: 300; background: rgba(10,5,8,0.97); display: flex; align-items: center; justify-content: center; padding: 20px; }
+  .inspo-lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; border: 1px solid var(--border2); }
+  .inspo-lightbox-close { position: fixed; top: 20px; right: 24px; background: none; border: 1px solid var(--border2); color: var(--muted); font-size: 20px; width: 40px; height: 40px; cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+  .inspo-lightbox-close:hover { border-color: var(--rose); color: var(--rose-lt); }
+
   .list-panel { padding: 24px; }
   .list-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
   .list-table { width: 100%; border-collapse: collapse; font-size: 12px; }
@@ -206,20 +178,28 @@ const styles = `
   .list-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--muted); vertical-align: top; }
   .list-table tr:hover td { background: var(--bg3); }
   .list-table td.name { color: var(--text); font-weight: 400; }
-  .tab-row { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid var(--border); }
+
+  .tab-row { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--border); }
   .tab { padding: 10px 20px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; background: none; border-top: none; border-left: none; border-right: none; font-family: 'DM Sans', sans-serif; }
   .tab.active { color: var(--rose-lt); border-bottom-color: var(--rose); }
   .tab:hover { color: var(--muted); }
   .loading { text-align: center; padding: 60px; color: var(--dim); font-size: 13px; letter-spacing: 2px; }
+
+  .block-panel { padding: 24px; }
+  .block-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
+  .block-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+  .block-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color 0.2s; flex: 1; min-width: 140px; }
+  .block-input:focus { border-color: var(--rose-dim); }
+  .blocked-list { display: flex; flex-direction: column; gap: 6px; }
+  .blocked-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); font-size: 13px; }
+  .blocked-date { color: var(--rose-lt); font-family: 'Playfair Display', serif; font-style: italic; }
+  .blocked-reason { color: var(--muted); font-size: 12px; }
+
   .avail-panel { padding: 24px; }
   .avail-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
   .avail-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
   .time-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
-  .time-chip {
-    padding: 6px 12px; border: 1px solid var(--border2); background: var(--bg);
-    font-size: 11px; letter-spacing: 1px; color: var(--muted); cursor: pointer;
-    transition: all 0.15s; border-radius: 2px;
-  }
+  .time-chip { padding: 6px 12px; border: 1px solid var(--border2); background: var(--bg); font-size: 11px; letter-spacing: 1px; color: var(--muted); cursor: pointer; transition: all 0.15s; border-radius: 2px; }
   .time-chip:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
   .time-chip.selected { background: #200e18; border-color: var(--rose); color: var(--rose-lt); }
   .avail-date-group { margin-bottom: 20px; background: var(--bg2); border: 1px solid var(--border); }
@@ -230,19 +210,6 @@ const styles = `
   .avail-time-remove:hover { color: var(--rose); }
   .month-nav { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
   .month-nav h3 { font-family: 'Playfair Display', serif; font-size: 18px; font-style: italic; }
-
-  /* BLOCK DATE */
-  .block-panel { padding: 24px; border-top: 1px solid var(--border); }
-  .block-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
-  .block-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
-  .block-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; padding: 10px 14px; outline: none; transition: border-color 0.2s; flex: 1; min-width: 140px; }
-  .block-input:focus { border-color: var(--rose-dim); }
-  .blocked-list { display: flex; flex-direction: column; gap: 6px; }
-  .blocked-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--bg2); border: 1px solid var(--border); font-size: 13px; }
-  .blocked-date { color: var(--rose-lt); font-family: 'Playfair Display', serif; font-style: italic; }
-  .blocked-reason { color: var(--muted); font-size: 12px; }
-  .btn-sm { padding: 6px 14px; font-size: 10px; letter-spacing: 2px; }
-
 `;
 
 export default function Admin() {
@@ -267,6 +234,9 @@ export default function Admin() {
   const [savingAvail, setSavingAvail] = useState(false);
   const [availMonth, setAvailMonth] = useState(new Date().getMonth());
   const [availYear, setAvailYear] = useState(new Date().getFullYear());
+  const [sendingReminders, setSendingReminders] = useState(false);
+  const [reminderResult, setReminderResult] = useState(null);
+  const [inspoLightbox, setInspoLightbox] = useState(null);
 
   function login() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); loadBookings(); }
@@ -284,12 +254,35 @@ export default function Admin() {
     finally { setLoading(false); }
   }
 
+  async function handleDelete(id) {
+    await deleteBooking(id);
+    setBookings(prev => prev.filter(b => b.id !== id));
+    setConfirmDelete(null);
+  }
+
   const TIME_OPTIONS = ["8:00 AM","9:00 AM","10:00 AM","11:00 AM","12:00 PM","1:00 PM","2:00 PM","3:00 PM","4:00 PM","5:00 PM","6:00 PM","7:00 PM"];
+
+  async function handleBlockDate() {
+    if (!blockDateInput) return;
+    setBlocking(true);
+    try {
+      await blockDate(blockDateInput, blockReason);
+      const blocked = await fetchBlockedDates();
+      setBlockedDates(blocked);
+      setBlockDateInput("");
+      setBlockReason("");
+    } catch { }
+    finally { setBlocking(false); }
+  }
+
+  async function handleUnblock(id) {
+    await unblockDate(id);
+    setBlockedDates(prev => prev.filter(b => b.id !== id));
+  }
 
   async function handleAddAvailability() {
     if (!availDateInput || selectedTimes.length === 0) return;
     setSavingAvail(true);
-    // Format date as "Month D, YYYY"
     const d = new Date(availDateInput + "T12:00:00");
     const dateStr = `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
     try {
@@ -323,33 +316,18 @@ export default function Admin() {
     return Object.entries(grouped).sort((x, y) => new Date(x[0]) - new Date(y[0]));
   }
 
-  async function handleBlockDate() {
-    if (!blockDateInput) return;
-    setBlocking(true);
+  async function handleSendReminders() {
+    setSendingReminders(true);
+    setReminderResult(null);
     try {
-      await blockDate(blockDateInput, blockReason);
-      const blocked = await fetchBlockedDates();
-      setBlockedDates(blocked);
-      setBlockDateInput("");
-      setBlockReason("");
-    } catch { }
-    finally { setBlocking(false); }
-  }
-
-  async function handleUnblock(id) {
-    await unblockDate(id);
-    setBlockedDates(prev => prev.filter(b => b.id !== id));
-  }
-
-  function isDateBlocked(day) {
-    const dateStr = `${MONTHS[calMonth]} ${day}, ${calYear}`;
-    return blockedDates.some(b => b.date === dateStr);
-  }
-
-  async function handleDelete(id) {
-    await deleteBooking(id);
-    setBookings(prev => prev.filter(b => b.id !== id));
-    setConfirmDelete(null);
+      const res = await fetch("/api/send-reminders?secret=faerie-reminders-2024");
+      const data = await res.json();
+      setReminderResult(data.message || "Done!");
+    } catch {
+      setReminderResult("Something went wrong. Try again.");
+    } finally {
+      setSendingReminders(false);
+    }
   }
 
   const daysInMonth = getDaysInMonth(calYear, calMonth);
@@ -366,6 +344,11 @@ export default function Admin() {
   const selectedBookings = selectedDay ? bookingsForDay(selectedDay) : [];
   const paidCount = bookings.filter(b => b.status === "paid").length;
   const pendingCount = bookings.filter(b => b.status === "pending").length;
+
+  function getInspoUrls(booking) {
+    if (!booking.inspo_url) return [];
+    return booking.inspo_url.split(',').filter(Boolean);
+  }
 
   if (!authed) return (
     <>
@@ -389,6 +372,12 @@ export default function Admin() {
   return (
     <>
       <style>{styles}</style>
+      {inspoLightbox && (
+        <div className="inspo-lightbox" onClick={() => setInspoLightbox(null)}>
+          <img src={inspoLightbox} alt="Inspo" onClick={e => e.stopPropagation()} />
+          <button className="inspo-lightbox-close" onClick={() => setInspoLightbox(null)}>✕</button>
+        </div>
+      )}
       <div className="page">
         <div className="header">
           <div className="header-left">
@@ -402,19 +391,25 @@ export default function Admin() {
               <div className="stat"><div className="stat-num">{bookings.length}</div><div className="stat-label">Total</div></div>
             </div>
             <button className="btn-ghost btn" onClick={loadBookings}>↻ Refresh</button>
+            <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}}>
+              <button className="btn btn-primary btn-sm" disabled={sendingReminders} onClick={handleSendReminders}>
+                {sendingReminders ? "Sending..." : "📱 Send Tomorrow's Reminders"}
+              </button>
+              {reminderResult && <span style={{fontSize:11,color:"var(--rose-lt)",letterSpacing:1}}>{reminderResult}</span>}
+            </div>
           </div>
         </div>
 
         <div style={{padding:"0 28px", borderBottom:"1px solid var(--border)", background:"var(--bg2)"}}>
           <div className="tab-row">
-            <button className={`tab ${tab === "calendar" ? "active" : ""}`} onClick={() => setTab("calendar")}>Calendar View</button>
+            <button className={`tab ${tab === "calendar" ? "active" : ""}`} onClick={() => setTab("calendar")}>Calendar</button>
             <button className={`tab ${tab === "list" ? "active" : ""}`} onClick={() => setTab("list")}>All Bookings</button>
-            <button className={`tab ${tab === "blocked" ? "active" : ""}`} onClick={() => setTab("blocked")}>Block Dates</button>
             <button className={`tab ${tab === "availability" ? "active" : ""}`} onClick={() => setTab("availability")}>Availability</button>
+            <button className={`tab ${tab === "blocked" ? "active" : ""}`} onClick={() => setTab("blocked")}>Block Dates</button>
           </div>
         </div>
 
-        {loading && <div className="loading">Loading bookings...</div>}
+        {loading && <div className="loading">Loading...</div>}
 
         {!loading && tab === "calendar" && (
           <div className="main">
@@ -431,12 +426,10 @@ export default function Admin() {
                   const dayBookings = bookingsForDay(day);
                   const hasBooking = dayBookings.length > 0;
                   const isToday = day === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-                  const blocked = isDateBlocked(day);
                   return (
                     <div key={i}
-                      className={`cal-day current ${isToday ? "today" : ""} ${hasBooking ? "has-booking" : ""} ${selectedDay === day ? "selected" : ""} ${blocked ? "blocked" : ""}`}
+                      className={`cal-day current ${isToday ? "today" : ""} ${hasBooking ? "has-booking" : ""} ${selectedDay === day ? "selected" : ""}`}
                       onClick={() => setSelectedDay(selectedDay === day ? null : day)}
-                      style={{ opacity: blocked ? 0.4 : 1, textDecoration: blocked ? "line-through" : "none" }}
                     >
                       {day}
                       {hasBooking && (
@@ -463,34 +456,103 @@ export default function Admin() {
               </div>
               {!selectedDay && <div className="sidebar-empty">← Click a highlighted date to view appointments</div>}
               {selectedDay && selectedBookings.length === 0 && <div className="sidebar-empty">No bookings on this day</div>}
-              {selectedBookings.map(b => (
-                <div key={b.id} className="booking-card">
-                  <div className="booking-top">
-                    <div className="booking-time">{b.time}</div>
-                    <div className={`booking-status ${b.status}`}>{b.status}</div>
-                  </div>
-                  <div className="booking-service">{b.service}</div>
-                  <div className="booking-info">
-                    <span>👤 {b.client_name}</span>
-                    <span>📧 {b.client_email}</span>
-                    <span>📞 {b.client_phone}</span>
-                    {b.notes && <span>📝 {b.notes}</span>}
-                    {b.duration && <span>⏱ {b.duration}</span>}
-                    {b.price && <span>💰 {b.price}</span>}
-                  </div>
-                  <div className="booking-actions">
-                    {confirmDelete === b.id
-                      ? <div style={{display:"flex",gap:8,alignItems:"center"}}>
-                          <span style={{fontSize:11,color:"var(--muted)"}}>Sure?</span>
-                          <button className="btn-danger" onClick={() => handleDelete(b.id)}>Yes, Delete</button>
-                          <button className="btn-ghost btn" onClick={() => setConfirmDelete(null)}>No</button>
+              {selectedBookings.map(b => {
+                const inspoUrls = getInspoUrls(b);
+                return (
+                  <div key={b.id} className="booking-card">
+                    <div className="booking-top">
+                      <div className="booking-time">{b.time}</div>
+                      <div className={`booking-status ${b.status}`}>{b.status}</div>
+                    </div>
+                    <div className="booking-service">{b.service}</div>
+                    <div className="booking-info">
+                      <span>👤 {b.client_name}</span>
+                      <span>📧 {b.client_email}</span>
+                      <span>📞 {b.client_phone}</span>
+                      {b.notes && <span>📝 {b.notes}</span>}
+                      {b.duration && <span>⏱ {b.duration}</span>}
+                      {b.price && <span>💰 {b.price}</span>}
+                    </div>
+                    {inspoUrls.length > 0 && (
+                      <div className="inspo-section">
+                        <div className="inspo-section-label">Inspo Photo{inspoUrls.length > 1 ? "s" : ""}</div>
+                        <div className="inspo-grid">
+                          {inspoUrls.map((url, i) => (
+                            <img key={i} src={url} alt={`Inspo ${i+1}`} className="inspo-thumb" onClick={() => setInspoLightbox(url)} />
+                          ))}
                         </div>
-                      : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel Booking</button>
-                    }
+                      </div>
+                    )}
+                    <div className="booking-actions">
+                      {confirmDelete === b.id
+                        ? <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                            <span style={{fontSize:11,color:"var(--muted)"}}>Sure?</span>
+                            <button className="btn-danger" onClick={() => handleDelete(b.id)}>Yes, Delete</button>
+                            <button className="btn-ghost btn" onClick={() => setConfirmDelete(null)}>No</button>
+                          </div>
+                        : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel Booking</button>
+                      }
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+          </div>
+        )}
+
+        {!loading && tab === "list" && (
+          <div className="list-panel">
+            <h3 className="list-title">All Bookings</h3>
+            <table className="list-table">
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Service</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th>Contact</th>
+                  <th>Inspo</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {bookings.length === 0 && (
+                  <tr><td colSpan={8} style={{textAlign:"center",padding:40,color:"var(--dim)"}}>No bookings yet</td></tr>
+                )}
+                {bookings.map(b => {
+                  const inspoUrls = getInspoUrls(b);
+                  return (
+                    <tr key={b.id}>
+                      <td className="name">{b.client_name}</td>
+                      <td>{b.service}</td>
+                      <td>{b.date}</td>
+                      <td>{b.time}</td>
+                      <td><span className={`booking-status ${b.status}`}>{b.status}</span></td>
+                      <td>{b.client_email}<br/>{b.client_phone}</td>
+                      <td>
+                        {inspoUrls.length > 0 ? (
+                          <div style={{display:"flex",gap:4}}>
+                            {inspoUrls.map((url, i) => (
+                              <img key={i} src={url} alt={`Inspo ${i+1}`} style={{width:40,height:40,objectFit:"cover",border:"1px solid var(--border2)",borderRadius:2,cursor:"pointer"}} onClick={() => setInspoLightbox(url)} />
+                            ))}
+                          </div>
+                        ) : <span style={{color:"var(--dim)"}}>—</span>}
+                      </td>
+                      <td>
+                        {confirmDelete === b.id
+                          ? <div style={{display:"flex",gap:6,alignItems:"center"}}>
+                              <button className="btn-danger" onClick={() => handleDelete(b.id)}>Confirm</button>
+                              <button className="btn-ghost btn" onClick={() => setConfirmDelete(null)}>No</button>
+                            </div>
+                          : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel</button>
+                        }
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
         )}
 
@@ -500,7 +562,6 @@ export default function Admin() {
             <p style={{fontSize:12,color:"var(--muted)",marginBottom:24,letterSpacing:0.5,lineHeight:1.7}}>
               Add dates and times that clients can book. Changes appear on the booking site immediately.
             </p>
-
             <div style={{background:"var(--bg2)",border:"1px solid var(--border)",padding:"20px 24px",marginBottom:28}}>
               <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:16}}>Add New Availability</div>
               <div className="avail-form">
@@ -516,21 +577,17 @@ export default function Admin() {
                 ))}
               </div>
               <div style={{marginTop:16,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <span style={{fontSize:12,color:"var(--muted)"}}>
-                  {selectedTimes.length} time{selectedTimes.length !== 1 ? "s" : ""} selected
-                </span>
+                <span style={{fontSize:12,color:"var(--muted)"}}>{selectedTimes.length} time{selectedTimes.length !== 1 ? "s" : ""} selected</span>
                 <button className="btn btn-primary btn-sm" disabled={!availDateInput || selectedTimes.length === 0 || savingAvail} onClick={handleAddAvailability}>
                   {savingAvail ? "Saving..." : "Add Availability ✦"}
                 </button>
               </div>
             </div>
-
             <div className="month-nav">
               <button className="cal-nav-btn" onClick={() => { if (availMonth === 0) { setAvailMonth(11); setAvailYear(y => y-1); } else setAvailMonth(m => m-1); }}>‹</button>
               <h3>{MONTHS[availMonth]} {availYear}</h3>
               <button className="cal-nav-btn" onClick={() => { if (availMonth === 11) { setAvailMonth(0); setAvailYear(y => y+1); } else setAvailMonth(m => m+1); }}>›</button>
             </div>
-
             {availForMonth(availMonth, availYear).length === 0 && (
               <p style={{fontSize:13,color:"var(--dim)",letterSpacing:1}}>No availability set for {MONTHS[availMonth]} {availYear}.</p>
             )}
@@ -572,7 +629,6 @@ export default function Admin() {
                 {blocking ? "Blocking..." : "Block Date ✦"}
               </button>
             </div>
-
             <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:12}}>
               Currently Blocked — {blockedDates.length} date{blockedDates.length !== 1 ? "s" : ""}
             </div>
@@ -588,49 +644,6 @@ export default function Admin() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
-
-        {!loading && tab === "list" && (
-          <div className="list-panel">
-            <h3 className="list-title">All Bookings</h3>
-            <table className="list-table">
-              <thead>
-                <tr>
-                  <th>Client</th>
-                  <th>Service</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Status</th>
-                  <th>Contact</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.length === 0 && (
-                  <tr><td colSpan={7} style={{textAlign:"center",padding:40,color:"var(--dim)"}}>No bookings yet</td></tr>
-                )}
-                {bookings.map(b => (
-                  <tr key={b.id}>
-                    <td className="name">{b.client_name}</td>
-                    <td>{b.service}</td>
-                    <td>{b.date}</td>
-                    <td>{b.time}</td>
-                    <td><span className={`booking-status ${b.status}`}>{b.status}</span></td>
-                    <td>{b.client_email}<br/>{b.client_phone}</td>
-                    <td>
-                      {confirmDelete === b.id
-                        ? <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                            <button className="btn-danger" onClick={() => handleDelete(b.id)}>Confirm</button>
-                            <button className="btn-ghost btn" onClick={() => setConfirmDelete(null)}>No</button>
-                          </div>
-                        : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel</button>
-                      }
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         )}
       </div>
