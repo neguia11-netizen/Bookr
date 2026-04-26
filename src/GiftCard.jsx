@@ -266,8 +266,12 @@ export default function GiftCard() {
           </div>
 
           <div className="note">
-            <p>Gift cards never expire · Questions? <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
-            <p style={{marginTop:6}}>To redeem, mention your gift card email when booking at <a href="/">acrylicfaerie.com</a></p>
+            <p style={{fontSize:14,color:"var(--text)",fontFamily:"Playfair Display, serif",fontStyle:"italic",marginBottom:12}}>How to Redeem Your Gift Card</p>
+            <p style={{marginBottom:8}}>✦ <strong style={{color:"var(--text)"}}>Book your appointment</strong> at <a href="/">acrylicfaerie.com</a> as normal and pay the $10 deposit.</p>
+            <p style={{marginBottom:8}}>✦ <strong style={{color:"var(--text)"}}>At your appointment</strong>, show your Stripe receipt email to apply your gift card balance toward your service.</p>
+            <p style={{marginBottom:8}}>✦ <strong style={{color:"var(--text)"}}>Any remaining balance</strong> can be used toward a future appointment — gift cards never expire.</p>
+            <p style={{marginBottom:8}}>✦ <strong style={{color:"var(--text)"}}>Gifting to someone?</strong> Simply forward your Stripe receipt email to them — no printing needed!</p>
+            <p style={{marginTop:16,fontSize:11,color:"var(--dim)"}}>Questions? <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
           </div>
         </div>
 
