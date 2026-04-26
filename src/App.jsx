@@ -303,10 +303,8 @@ export default function BeautyBooking() {
   const [availabilityData, setAvailabilityData] = useState([]);
   const [showPolicy, setShowPolicy] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
-  const [inspoFile, setInspoFile] = useState(null);
-  const [inspoPreview, setInspoPreview] = useState(null);
+  const [inspoFiles, setInspoFiles] = useState([]); // [{preview, url, uploading}]
   const [inspoUploading, setInspoUploading] = useState(false);
-  const [inspoUrl, setInspoUrl] = useState("");
 
   useEffect(() => {
     getBookedSlots().then(slots => setBookedSlots(slots));
@@ -314,28 +312,41 @@ export default function BeautyBooking() {
     fetchAvailability().then(avail => setAvailabilityData(avail));
   }, []);
 
-  async function handleInspoUpload(file) {
-    if (!file) return;
-    setInspoFile(file);
-    setInspoPreview(URL.createObjectURL(file));
+  async function handleInspoUpload(files) {
+    if (!files || files.length === 0) return;
     setInspoUploading(true);
-    try {
-      const fileName = `inspo-${Date.now()}-${file.name.replace(/ /g, '-')}`;
-      const res = await fetch(`${SUPABASE_URL}/storage/v1/object/inspo/${fileName}`, {
-        method: "POST",
-        headers: {
-          "apikey": SUPABASE_KEY,
-          "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": file.type,
-        },
-        body: file,
-      });
-      if (res.ok) {
-        const url = `${SUPABASE_URL}/storage/v1/object/public/inspo/${fileName}`;
-        setInspoUrl(url);
-      }
-    } catch { }
-    finally { setInspoUploading(false); }
+    const newFiles = Array.from(files);
+    // Add previews immediately
+    const previews = newFiles.map(f => ({ preview: URL.createObjectURL(f), url: "", uploading: true }));
+    setInspoFiles(prev => [...prev, ...previews]);
+    // Upload each file
+    const uploaded = await Promise.all(newFiles.map(async (file, i) => {
+      try {
+        const fileName = `inspo-${Date.now()}-${i}-${file.name.replace(/ /g, '-')}`;
+        const res = await fetch(`${SUPABASE_URL}/storage/v1/object/inspo/${fileName}`, {
+          method: "POST",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
+            "Content-Type": file.type,
+          },
+          body: file,
+        });
+        if (res.ok) {
+          return { preview: URL.createObjectURL(file), url: `${SUPABASE_URL}/storage/v1/object/public/inspo/${fileName}`, uploading: false };
+        }
+      } catch { }
+      return { preview: URL.createObjectURL(file), url: "", uploading: false };
+    }));
+    setInspoFiles(prev => {
+      const existing = prev.slice(0, prev.length - newFiles.length);
+      return [...existing, ...uploaded];
+    });
+    setInspoUploading(false);
+  }
+
+  function removeInspo(index) {
+    setInspoFiles(prev => prev.filter((_, i) => i !== index));
   }
 
   function getAvailableTimesFromData(year, month, day) {
@@ -403,7 +414,7 @@ export default function BeautyBooking() {
     localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingPhone", form.phone);
     localStorage.setItem("bookingNotes", form.notes || "");
-    localStorage.setItem("bookingInspo", inspoUrl || "");
+    localStorage.setItem("bookingInspo", inspoFiles.map(f => f.url).filter(Boolean).join(","));
     setStep(4);
   }
 
@@ -561,21 +572,25 @@ export default function BeautyBooking() {
                   <textarea className="form-input" placeholder="Any special requests or allergies..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
                 </div>
                 <div className="form-field full inspo-upload">
-                  <label className="inspo-label">Inspo Photo (optional)</label>
-                  {!inspoPreview ? (
-                    <div className="inspo-drop">
-                      <input type="file" accept="image/*" onChange={e => e.target.files[0] && handleInspoUpload(e.target.files[0])} />
-                      <p className="inspo-drop-text">Tap to upload · <span>Browse photos</span></p>
-                      <p style={{fontSize:11,color:"var(--dim)",marginTop:4}}>JPG, PNG, HEIC up to 10MB</p>
-                    </div>
-                  ) : (
-                    <div className="inspo-preview">
-                      <img src={inspoPreview} alt="Inspo preview" />
-                      <button className="inspo-remove" onClick={() => { setInspoFile(null); setInspoPreview(null); setInspoUrl(""); }}>✕</button>
+                  <label className="inspo-label">Inspo Photos (optional)</label>
+                  <div className="inspo-drop">
+                    <input type="file" accept="image/*" multiple onChange={e => e.target.files.length > 0 && handleInspoUpload(e.target.files)} />
+                    <p className="inspo-drop-text">Tap to upload · <span>Browse photos</span></p>
+                    <p style={{fontSize:11,color:"var(--dim)",marginTop:4}}>Select multiple photos · JPG, PNG, HEIC</p>
+                  </div>
+                  {inspoUploading && <p className="inspo-uploading">Uploading photos...</p>}
+                  {inspoFiles.length > 0 && (
+                    <div style={{display:"flex",flexWrap:"wrap",gap:8,marginTop:10}}>
+                      {inspoFiles.map((f, i) => (
+                        <div key={i} className="inspo-preview" style={{position:"relative"}}>
+                          <img src={f.preview} alt={`Inspo ${i+1}`} style={{width:80,height:80,objectFit:"cover",border:"1px solid var(--border2)",borderRadius:2,opacity:f.uploading?0.5:1}} />
+                          {f.uploading && <div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"var(--muted)"}}>...</div>}
+                          <button className="inspo-remove" onClick={() => removeInspo(i)}>✕</button>
+                        </div>
+                      ))}
                     </div>
                   )}
-                  {inspoUploading && <p className="inspo-uploading">Uploading photo...</p>}
-                  {inspoUrl && !inspoUploading && <p style={{fontSize:11,color:"var(--green,#4a9a6a)",marginTop:6,letterSpacing:1}}>✓ Photo uploaded</p>}
+                  {inspoFiles.length > 0 && !inspoUploading && <p style={{fontSize:11,color:"#4a9a6a",marginTop:6,letterSpacing:1}}>✓ {inspoFiles.filter(f=>f.url).length} of {inspoFiles.length} photo{inspoFiles.length!==1?"s":""} uploaded</p>}
                 </div>
               </div>
             </>
