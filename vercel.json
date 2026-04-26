@@ -3,6 +3,7 @@
     { "source": "/portfolio", "destination": "/" },
     { "source": "/success", "destination": "/" },
     { "source": "/admin", "destination": "/" },
+    { "source": "/giftcard", "destination": "/" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
