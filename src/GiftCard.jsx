@@ -186,6 +186,44 @@ const styles = `
   .note a { color: var(--rose-dim); text-decoration: none; }
   .note a:hover { color: var(--rose-lt); }
 
+
+  .gift-form-section {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 36px;
+    margin-bottom: 28px;
+    position: relative;
+  }
+  .gift-form-section::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim));
+  }
+  .gift-form-title { font-family: 'Playfair Display', serif; font-size: 22px; font-style: italic; color: var(--text); margin-bottom: 6px; }
+  .gift-form-sub { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-bottom: 28px; }
+  .amount-select { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+  .amount-btn {
+    padding: 12px 20px; border: 1px solid var(--border2); background: var(--bg);
+    color: var(--muted); font-family: 'Playfair Display', serif; font-style: italic;
+    font-size: 18px; cursor: pointer; transition: all 0.2s; flex: 1; text-align: center;
+    min-width: 80px;
+  }
+  .amount-btn:hover { border-color: var(--rose-dim); color: var(--rose-lt); }
+  .amount-btn.selected { background: #200e18; border-color: var(--rose); color: var(--rose-lt); box-shadow: 0 0 12px #c4415a22; }
+  .gift-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  @media (max-width: 600px) { .gift-grid { grid-template-columns: 1fr; } }
+  .gift-field { display: flex; flex-direction: column; gap: 8px; }
+  .gift-field.full { grid-column: 1 / -1; }
+  .gift-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); }
+  .gift-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; border-radius: 2px; }
+  .gift-input:focus { border-color: var(--rose-dim); box-shadow: 0 0 0 3px #c4415a18; }
+  .gift-input::placeholder { color: var(--dim); }
+  textarea.gift-input { resize: vertical; min-height: 80px; }
+  .gift-submit { width: 100%; padding: 16px; background: var(--rose); color: white; border: none; font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; margin-top: 8px; border-radius: 2px; }
+  .gift-submit:hover { background: #d4506a; transform: translateY(-1px); box-shadow: 0 4px 20px #c4415a44; }
+  .gift-submit:disabled { background: var(--border2); color: var(--dim); cursor: not-allowed; transform: none; box-shadow: none; }
+  .divider-or { display: flex; align-items: center; gap: 16px; margin: 32px 0; color: var(--dim); font-size: 11px; letter-spacing: 3px; text-transform: uppercase; }
+  .divider-or::before, .divider-or::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
   .footer { border-top: 1px solid var(--border); padding: 40px 24px; text-align: center; background: var(--bg2); }
   .footer-sparkle { font-size: 11px; letter-spacing: 6px; color: var(--rose); margin-bottom: 16px; display: block; }
   .footer-icons { display: flex; justify-content: center; align-items: center; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -199,6 +237,9 @@ const styles = `
 
 export default function GiftCard() {
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [selectedAmount, setSelectedAmount] = useState(null);
+  const [giftForm, setGiftForm] = useState({ recipientName: "", recipientEmail: "", senderName: "", message: "" });
+  const [showForm, setShowForm] = useState(false);
 
   return (
     <>
@@ -223,6 +264,58 @@ export default function GiftCard() {
             <p>Treat someone special to an Acrylic Faerie experience. Gift cards are delivered instantly by email and never expire.</p>
           </div>
 
+          {/* SEND AS GIFT FORM */}
+          <div className="gift-form-section">
+            <h3 className="gift-form-title">Send as a Gift</h3>
+            <p className="gift-form-sub">Fill in the details below — we'll send a beautiful gift email to the recipient</p>
+
+            <div style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:12}}>Select Amount</div>
+            <div className="amount-select">
+              {GIFT_CARDS.map(card => (
+                <button key={card.amount} className={`amount-btn ${selectedAmount?.amount === card.amount ? "selected" : ""}`} onClick={() => setSelectedAmount(card)}>
+                  {card.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="gift-grid">
+              <div className="gift-field">
+                <label className="gift-label">Recipient's Name</label>
+                <input className="gift-input" placeholder="Jane Doe" value={giftForm.recipientName} onChange={e => setGiftForm({...giftForm, recipientName: e.target.value})} />
+              </div>
+              <div className="gift-field">
+                <label className="gift-label">Recipient's Email</label>
+                <input className="gift-input" type="email" placeholder="jane@email.com" value={giftForm.recipientEmail} onChange={e => setGiftForm({...giftForm, recipientEmail: e.target.value})} />
+              </div>
+              <div className="gift-field">
+                <label className="gift-label">Your Name</label>
+                <input className="gift-input" placeholder="Your name" value={giftForm.senderName} onChange={e => setGiftForm({...giftForm, senderName: e.target.value})} />
+              </div>
+              <div className="gift-field">
+                <label className="gift-label">Personal Message (optional)</label>
+                <input className="gift-input" placeholder="Happy Birthday! Enjoy your nails 💕" value={giftForm.message} onChange={e => setGiftForm({...giftForm, message: e.target.value})} />
+              </div>
+            </div>
+
+            <button
+              className="gift-submit"
+              disabled={!selectedAmount || !giftForm.recipientName || !giftForm.recipientEmail || !giftForm.senderName}
+              onClick={() => {
+                localStorage.setItem("giftRecipientName", giftForm.recipientName);
+                localStorage.setItem("giftRecipientEmail", giftForm.recipientEmail);
+                localStorage.setItem("giftSenderName", giftForm.senderName);
+                localStorage.setItem("giftMessage", giftForm.message);
+                localStorage.setItem("giftAmount", selectedAmount?.label);
+                window.location.href = selectedAmount?.link;
+              }}
+            >
+              Purchase & Send Gift {selectedAmount ? `— ${selectedAmount.label}` : ""} ✦
+            </button>
+          </div>
+
+          <div className="divider-or">or browse individual cards</div>
+
+          {/* INDIVIDUAL CARDS */}
           <div className="cards-grid">
             {GIFT_CARDS.map((card) => (
               <a
@@ -237,9 +330,7 @@ export default function GiftCard() {
                 <span className="card-icon">{card.icon}</span>
                 <div className="card-amount">{card.label}</div>
                 <p className="card-desc">{card.description}</p>
-                <div className="card-btn">
-                  Purchase Gift Card →
-                </div>
+                <div className="card-btn">Purchase Gift Card →</div>
               </a>
             ))}
           </div>
