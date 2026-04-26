@@ -705,6 +705,9 @@ export default function BeautyBooking() {
               <span>Email</span>
             </a>
           </div>
+          <div style={{marginBottom:16}}>
+            <a href="/giftcard" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Gift Cards ✦</a>
+          </div>
           <p className="footer-email">© 2026 Acrylic Faerie · San Antonio, TX · <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
         </div>
 
