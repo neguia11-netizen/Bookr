@@ -132,10 +132,11 @@ export default function Success() {
     const name     = localStorage.getItem("bookingName");
     const phone    = localStorage.getItem("bookingPhone");
     const notes    = localStorage.getItem("bookingNotes") || "";
-    const inspoUrl = localStorage.getItem("bookingInspo") || "";
+    const inspoRaw = localStorage.getItem("bookingInspo") || "";
+    const inspoUrls = inspoRaw ? inspoRaw.split(',').filter(Boolean) : [];
 
     if (service && date && time) {
-      setBooking({ service, date, time, name, email, inspoUrl });
+      setBooking({ service, date, time, name, email, inspoUrls });
 
       Promise.allSettled([
         saveBooking({
@@ -144,7 +145,7 @@ export default function Success() {
           client_email: email,
           client_phone: phone,
           notes,
-          inspo_url: inspoUrl || null,
+          inspo_url: inspoUrls.join(',') || null,
         }),
         sendEmail({
           service, date, time, duration, price,
@@ -187,10 +188,14 @@ export default function Success() {
             <div className="detail-row"><span className="detail-key">Deposit Paid</span><span className="detail-val">$10.00 ✦</span></div>
           </div>
 
-          {booking?.inspoUrl && (
+          {booking?.inspoUrls?.length > 0 && (
             <div className="inspo-saved">
-              <p>Your Inspo Photo</p>
-              <img src={booking.inspoUrl} alt="Your inspo" />
+              <p>Your Inspo Photo{booking.inspoUrls.length > 1 ? "s" : ""}</p>
+              <div style={{display:"flex",flexWrap:"wrap",gap:8,justifyContent:"center"}}>
+                {booking.inspoUrls.map((url, i) => (
+                  <img key={i} src={url} alt={`Inspo ${i+1}`} style={{width:100,height:100,objectFit:"cover",border:"1px solid var(--border2)",borderRadius:2}} />
+                ))}
+              </div>
             </div>
           )}
 
