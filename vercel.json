@@ -5,6 +5,7 @@
     { "source": "/admin", "destination": "/" },
     { "source": "/giftcard", "destination": "/" },
     { "source": "/giftsuccess", "destination": "/" },
+    { "source": "/about", "destination": "/" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
