@@ -114,10 +114,67 @@ const styles = `
   .footer-note { margin-top:28px; font-size:11px; color:var(--dim); letter-spacing:1px; animation:fadeUp 0.6s ease 0.9s both; }
   .footer-note a { color:var(--rose-dim); text-decoration:none; }
   .footer-note a:hover { color:var(--rose-lt); }
+
+  .calendar-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px; animation: fadeUp 0.6s ease 0.7s both; }
+  .cal-btn { display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 1px solid var(--border2); background: var(--bg2); color: var(--muted); text-decoration: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; transition: all 0.2s; border-radius: 2px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+  .cal-btn:hover { border-color: var(--rose-dim); color: var(--rose-lt); background: var(--bg3); }
+  .cal-btn svg { width: 14px; height: 14px; fill: currentColor; flex-shrink: 0; }
+
   .inspo-saved { margin-bottom: 20px; animation:fadeUp 0.6s ease 0.65s both; }
   .inspo-saved p { font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--rose); margin-bottom:8px; }
   .inspo-saved img { max-width:100%; max-height:160px; object-fit:cover; border:1px solid var(--border2); border-radius:2px; }
 `;
+
+
+function buildGoogleCalendarUrl(booking) {
+  if (!booking) return "#";
+  const { service, date, time } = booking;
+
+  // Parse date and time into a Date object
+  const dateTimeStr = `${date} ${time}`;
+  const start = new Date(dateTimeStr);
+  if (isNaN(start)) return "#";
+
+  // Add 2 hours for end time
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+  const fmt = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const params = new URLSearchParams({
+    action: "TEMPLATE",
+    text: `Acrylic Faerie — ${service}`,
+    dates: `${fmt(start)}/${fmt(end)}`,
+    details: "Your nail appointment at Acrylic Faerie. Please arrive with clean bare nails!",
+
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function buildAppleCalendarUrl(booking) {
+  if (!booking) return "#";
+  const { service, date, time } = booking;
+  const dateTimeStr = `${date} ${time}`;
+  const start = new Date(dateTimeStr);
+  if (isNaN(start)) return "#";
+  const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  const fmt = d => d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+
+  const icsContent = [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "BEGIN:VEVENT",
+    `DTSTART:${fmt(start)}`,
+    `DTEND:${fmt(end)}`,
+    `SUMMARY:Acrylic Faerie — ${service}`,
+    "DESCRIPTION:Your nail appointment at Acrylic Faerie. Please arrive with clean bare nails!",
+
+    "END:VEVENT",
+    "END:VCALENDAR"
+  ].join("\n");
+
+  const blob = new Blob([icsContent], { type: "text/calendar" });
+  return URL.createObjectURL(blob);
+}
 
 export default function Success() {
   const [booking, setBooking] = useState(null);
@@ -154,6 +211,12 @@ export default function Success() {
           client_phone: phone,
           notes: notes || "None",
         }),
+        // Track loyalty points
+        fetch("/api/loyalty", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, name, secret: "faerie-loyalty-2024" }),
+        }),
       ]);
 
       localStorage.clear();
@@ -188,6 +251,19 @@ export default function Success() {
             <div className="detail-row"><span className="detail-key">Deposit Paid</span><span className="detail-val">$10.00 ✦</span></div>
           </div>
 
+          {booking && (
+            <div className="calendar-btns">
+              <a href={buildGoogleCalendarUrl(booking)} target="_blank" rel="noopener noreferrer" className="cal-btn">
+                <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/></svg>
+                Google Calendar
+              </a>
+              <a href={buildAppleCalendarUrl(booking)} download="acrylic-faerie-appointment.ics" className="cal-btn">
+                <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+                Apple Calendar
+              </a>
+            </div>
+          )}
+
           {booking?.inspoUrls?.length > 0 && (
             <div className="inspo-saved">
               <p>Your Inspo Photo{booking.inspoUrls.length > 1 ? "s" : ""}</p>
@@ -204,6 +280,7 @@ export default function Success() {
           <div className="next-steps">
             <h3>Before Your Appointment</h3>
             <div className="next-step-item"><span className="step-dot">✦</span><span>Check your email for your booking confirmation with all the details.</span></div>
+
             <div className="next-step-item"><span className="step-dot">✦</span><span>Come with clean, bare nails — no polish or product on them.</span></div>
             <div className="next-step-item"><span className="step-dot">✦</span><span>Save inspo pics! DM us on Instagram @acrylicfaerie if you have any questions.</span></div>
             <div className="next-step-item"><span className="step-dot">✦</span><span>Need to reschedule? Email us at acrylicfaerie.biz@gmail.com as soon as possible.</span></div>
