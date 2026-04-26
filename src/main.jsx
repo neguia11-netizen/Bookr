@@ -6,6 +6,7 @@ import Portfolio from './Portfolio.jsx'
 import Admin from './Admin.jsx'
 import GiftCard from './GiftCard.jsx'
 import GiftSuccess from './GiftSuccess.jsx'
+import About from './About.jsx'
 
 const path = window.location.pathname;
 
@@ -16,6 +17,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     : path === '/admin' ? <Admin />
     : path === '/giftcard' ? <GiftCard />
     : path === '/giftsuccess' ? <GiftSuccess />
+    : path === '/about' ? <About />
     : <App />}
   </React.StrictMode>,
 )
