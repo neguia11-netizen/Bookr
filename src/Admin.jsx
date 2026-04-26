@@ -195,6 +195,30 @@ const styles = `
   .blocked-date { color: var(--rose-lt); font-family: 'Playfair Display', serif; font-style: italic; }
   .blocked-reason { color: var(--muted); font-size: 12px; }
 
+
+  .loyalty-panel { padding: 24px; }
+  .loyalty-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
+  .loyalty-grid { display: grid; gap: 3px; }
+  .loyalty-card { background: var(--bg2); border: 1px solid var(--border); padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: background 0.15s; }
+  .loyalty-card:hover { background: var(--bg3); }
+  .loyalty-info { flex: 1; }
+  .loyalty-name { font-size: 14px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
+  .loyalty-email { font-size: 11px; color: var(--dim); letter-spacing: 0.5px; }
+  .loyalty-progress-wrap { flex: 1; }
+  .loyalty-progress-bar { height: 4px; background: var(--border); border-radius: 2px; margin-bottom: 6px; overflow: hidden; }
+  .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--rose-dim), var(--rose)); border-radius: 2px; transition: width 0.3s; }
+  .loyalty-progress-text { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .loyalty-badge { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+  .loyalty-badge.earned { background: var(--green-dim); color: var(--green); border: 1px solid var(--green); }
+  .loyalty-badge.progress { background: var(--amber-dim); color: var(--amber); border: 1px solid var(--amber); }
+  .loyalty-stats { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .loyalty-stat { background: var(--bg2); border: 1px solid var(--border); padding: 16px 20px; flex: 1; min-width: 120px; }
+  .loyalty-stat-num { font-family: 'Playfair Display', serif; font-size: 28px; color: var(--rose-lt); }
+  .loyalty-stat-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim); margin-top: 4px; }
+  .send-reward-btn { background: none; border: 1px solid var(--rose-dim); color: var(--rose-lt); font-size: 10px; letter-spacing: 2px; text-transform: uppercase; padding: 6px 12px; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif; border-radius: 2px; white-space: nowrap; }
+  .send-reward-btn:hover { background: var(--rose); color: white; border-color: var(--rose); }
+  .send-reward-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
   .avail-panel { padding: 24px; }
   .avail-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
   .avail-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
@@ -237,6 +261,9 @@ export default function Admin() {
   const [sendingReminders, setSendingReminders] = useState(false);
   const [reminderResult, setReminderResult] = useState(null);
   const [inspoLightbox, setInspoLightbox] = useState(null);
+  const [clients, setClients] = useState([]);
+  const [sendingReward, setSendingReward] = useState(null);
+  const [rewardResult, setRewardResult] = useState({});
 
   function login() {
     if (pw === ADMIN_PASSWORD) { setAuthed(true); loadBookings(); }
@@ -246,12 +273,41 @@ export default function Admin() {
   async function loadBookings() {
     setLoading(true);
     try {
-      const [data, blocked, avail] = await Promise.all([fetchBookings(), fetchBlockedDates(), fetchAvailability()]);
+      const [data, blocked, avail, clientsData] = await Promise.all([
+        fetchBookings(), fetchBlockedDates(), fetchAvailability(),
+        fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=booking_count.desc`, {
+          headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        }).then(r => r.json()).catch(() => [])
+      ]);
       setBookings(data);
       setBlockedDates(blocked);
       setAvailability(avail);
+      setClients(clientsData);
     } catch { }
     finally { setLoading(false); }
+  }
+
+  async function handleSendReward(client) {
+    setSendingReward(client.id);
+    try {
+      const res = await fetch("/api/loyalty", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: client.email,
+          name: client.email.split("@")[0],
+          secret: "faerie-loyalty-2024",
+          forceReward: true,
+        }),
+      });
+      const data = await res.json();
+      setRewardResult(prev => ({ ...prev, [client.id]: "✓ Reward sent!" }));
+      setTimeout(() => setRewardResult(prev => ({ ...prev, [client.id]: null })), 3000);
+    } catch {
+      setRewardResult(prev => ({ ...prev, [client.id]: "Failed" }));
+    } finally {
+      setSendingReward(null);
+    }
   }
 
   async function handleDelete(id) {
@@ -406,6 +462,7 @@ export default function Admin() {
             <button className={`tab ${tab === "list" ? "active" : ""}`} onClick={() => setTab("list")}>All Bookings</button>
             <button className={`tab ${tab === "availability" ? "active" : ""}`} onClick={() => setTab("availability")}>Availability</button>
             <button className={`tab ${tab === "blocked" ? "active" : ""}`} onClick={() => setTab("blocked")}>Block Dates</button>
+            <button className={`tab ${tab === "loyalty" ? "active" : ""}`} onClick={() => setTab("loyalty")}>Loyalty</button>
           </div>
         </div>
 
@@ -607,6 +664,76 @@ export default function Admin() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+
+        {!loading && tab === "loyalty" && (
+          <div className="loyalty-panel">
+            <h3 className="loyalty-title">Loyalty Program</h3>
+            <p style={{fontSize:12,color:"var(--muted)",marginBottom:24,letterSpacing:0.5,lineHeight:1.7}}>
+              Clients earn a reward after every 5 paid bookings — 20% off their next set + one free upgrade.
+            </p>
+
+            <div className="loyalty-stats">
+              <div className="loyalty-stat">
+                <div className="loyalty-stat-num">{clients.length}</div>
+                <div className="loyalty-stat-label">Total Clients</div>
+              </div>
+              <div className="loyalty-stat">
+                <div className="loyalty-stat-num">{clients.filter(c => c.booking_count >= 5).length}</div>
+                <div className="loyalty-stat-label">Earned Reward</div>
+              </div>
+              <div className="loyalty-stat">
+                <div className="loyalty-stat-num">{clients.reduce((acc, c) => acc + (c.loyalty_emails_sent || 0), 0)}</div>
+                <div className="loyalty-stat-label">Rewards Sent</div>
+              </div>
+              <div className="loyalty-stat">
+                <div className="loyalty-stat-num">{clients.filter(c => (c.booking_count % 5) === 4).length}</div>
+                <div className="loyalty-stat-label">1 Away from Reward</div>
+              </div>
+            </div>
+
+            {clients.length === 0 && <p style={{fontSize:13,color:"var(--dim)",letterSpacing:1}}>No clients yet — bookings will appear here after the first paid appointment.</p>}
+
+            <div className="loyalty-grid">
+              {clients.map(c => {
+                const progress = c.booking_count % 5;
+                const rewardsEarned = Math.floor(c.booking_count / 5);
+                const nextRewardIn = 5 - progress;
+                return (
+                  <div key={c.id} className="loyalty-card">
+                    <div className="loyalty-info">
+                      <div className="loyalty-name">{c.email.split("@")[0]}</div>
+                      <div className="loyalty-email">{c.email}</div>
+                    </div>
+                    <div className="loyalty-progress-wrap">
+                      <div className="loyalty-progress-bar">
+                        <div className="loyalty-progress-fill" style={{width:`${(progress / 5) * 100}%`}} />
+                      </div>
+                      <div className="loyalty-progress-text">
+                        {c.booking_count} booking{c.booking_count !== 1 ? "s" : ""} · {nextRewardIn === 5 ? "Reward earned! 🎉" : `${nextRewardIn} until reward`}
+                      </div>
+                    </div>
+                    <div style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}}>
+                      {rewardsEarned > 0 && (
+                        <span className="loyalty-badge earned">{rewardsEarned} reward{rewardsEarned !== 1 ? "s" : ""} earned</span>
+                      )}
+                      {progress > 0 && rewardsEarned === 0 && (
+                        <span className="loyalty-badge progress">{progress}/5</span>
+                      )}
+                      <button
+                        className="send-reward-btn"
+                        disabled={sendingReward === c.id}
+                        onClick={() => handleSendReward(c)}
+                      >
+                        {rewardResult[c.id] || (sendingReward === c.id ? "Sending..." : "Send Reward")}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
