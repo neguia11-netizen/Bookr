@@ -6,6 +6,7 @@
     { "source": "/giftcard", "destination": "/" },
     { "source": "/giftsuccess", "destination": "/" },
     { "source": "/about", "destination": "/" },
+    { "source": "/moodboard", "destination": "/" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
