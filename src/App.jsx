@@ -708,6 +708,7 @@ export default function BeautyBooking() {
           <div style={{marginBottom:16,display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
             <a href="/giftcard" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Gift Cards ✦</a>
             <a href="/about" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ About Me ✦</a>
+            <a href="/moodboard" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Mood Board ✦</a>
           </div>
           <p className="footer-email">© 2026 Acrylic Faerie · San Antonio, TX · <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
         </div>
