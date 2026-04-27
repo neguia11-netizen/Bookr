@@ -7,7 +7,6 @@ import Admin from './Admin.jsx'
 import GiftCard from './GiftCard.jsx'
 import GiftSuccess from './GiftSuccess.jsx'
 import About from './About.jsx'
-import MoodBoard from './MoodBoard.jsx'
 
 const path = window.location.pathname;
 
@@ -19,7 +18,6 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     : path === '/giftcard' ? <GiftCard />
     : path === '/giftsuccess' ? <GiftSuccess />
     : path === '/about' ? <About />
-    : path === '/moodboard' ? <MoodBoard />
     : <App />}
   </React.StrictMode>,
 )
