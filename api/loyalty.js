@@ -1,7 +1,7 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = "hello@acrylicfaerie.com";
+const FROM_EMAIL = "Acrylic Faerie <onboarding@resend.dev>";
 
 async function getOrCreateClient(email, name) {
   const getRes = await fetch(`${SUPABASE_URL}/rest/v1/clients?email=eq.${encodeURIComponent(email)}&select=*`, {
@@ -45,7 +45,7 @@ async function sendLoyaltyEmail(email, name) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: `Acrylic Faerie <${FROM_EMAIL}>`,
+      from: FROM_EMAIL,
       to: [email],
       subject: "You Earned a Reward! 💕✦ Acrylic Faerie",
       html: `
