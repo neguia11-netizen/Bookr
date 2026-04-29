@@ -1,5 +1,5 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = "hello@acrylicfaerie.com";
+const FROM_EMAIL = "Acrylic Faerie <onboarding@resend.dev>";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: `Acrylic Faerie <${FROM_EMAIL}>`,
+        from: FROM_EMAIL,
         to: [recipientEmail],
         subject: `${senderName} sent you an Acrylic Faerie Gift Card! 💕✦`,
         html: `
