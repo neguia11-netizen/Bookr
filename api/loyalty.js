@@ -1,7 +1,7 @@
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = "Acrylic Faerie <onboarding@resend.dev>";
+const FROM_EMAIL = "Acrylic Faerie <hello@acrylicfaerie.com>";
 
 async function getOrCreateClient(email) {
   const getRes = await fetch(`${SUPABASE_URL}/rest/v1/clients?email=eq.${encodeURIComponent(email)}&select=*`, {
