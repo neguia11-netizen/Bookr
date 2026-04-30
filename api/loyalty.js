@@ -139,7 +139,8 @@ export default async function handler(req, res) {
           },
           body: JSON.stringify({
             from: FROM_EMAIL,
-            to: [email],
+            to: ["acrylicfaerie.biz@gmail.com"], // temporary until domain verified
+          reply_to: email,
             subject: "You Earned a Reward! Acrylic Faerie",
             html: `<p>Hi ${name}! You have earned your loyalty reward — 20% off your next set + one free upgrade. Mention this email at your appointment!</p>`,
           }),
