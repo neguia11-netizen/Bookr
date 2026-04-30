@@ -127,6 +127,8 @@ export default async function handler(req, res) {
     const loyaltySent = freshClient?.loyalty_emails_sent || 0;
     const rewardsEarned = Math.floor(newCount / 5);
 
+    console.log("DEBUG:", { newCount, loyaltySent, rewardsEarned });
+
     if (rewardsEarned > loyaltySent) {
       const sent = await sendLoyaltyEmail(email, name);
       if (sent) {
@@ -135,7 +137,7 @@ export default async function handler(req, res) {
       }
     }
 
-    return res.status(200).json({ message: "Booking count updated", booking_count: newCount, reward: false });
+    return res.status(200).json({ message: "Booking count updated", booking_count: newCount, reward: false, debug: { newCount, loyaltySent, rewardsEarned } });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
