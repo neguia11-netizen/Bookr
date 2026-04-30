@@ -130,10 +130,29 @@ export default async function handler(req, res) {
     console.log("DEBUG:", { newCount, loyaltySent, rewardsEarned });
 
     if (rewardsEarned > loyaltySent) {
-      const sent = await sendLoyaltyEmail(email, name);
-      if (sent) {
-        await updateLoyaltyEmailsSent(client.id, rewardsEarned);
-        return res.status(200).json({ message: "Loyalty reward sent!", booking_count: newCount, reward: true });
+      try {
+        const emailRes = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${RESEND_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: FROM_EMAIL,
+            to: [email],
+            subject: "You Earned a Reward! Acrylic Faerie",
+            html: `<p>Hi ${name}! You have earned your loyalty reward — 20% off your next set + one free upgrade. Mention this email at your appointment!</p>`,
+          }),
+        });
+        const emailData = await emailRes.json();
+        if (emailRes.ok) {
+          await updateLoyaltyEmailsSent(client.id, rewardsEarned);
+          return res.status(200).json({ message: "Loyalty reward sent!", booking_count: newCount, reward: true });
+        } else {
+          return res.status(200).json({ message: "Email failed", booking_count: newCount, reward: false, emailError: emailData });
+        }
+      } catch (emailErr) {
+        return res.status(200).json({ message: "Email error", booking_count: newCount, reward: false, emailError: emailErr.message });
       }
     }
 
