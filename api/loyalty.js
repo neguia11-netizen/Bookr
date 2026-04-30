@@ -3,12 +3,11 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY;
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM_EMAIL = "Acrylic Faerie <onboarding@resend.dev>";
 
-async function getOrCreateClient(email, name) {
+async function getOrCreateClient(email) {
   const getRes = await fetch(`${SUPABASE_URL}/rest/v1/clients?email=eq.${encodeURIComponent(email)}&select=*`, {
     headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
   });
   const clients = await getRes.json();
-
   if (clients.length > 0) return clients[0];
 
   const createRes = await fetch(`${SUPABASE_URL}/rest/v1/clients`, {
@@ -25,19 +24,7 @@ async function getOrCreateClient(email, name) {
   return client;
 }
 
-async function updateLoyaltyEmailsSent(clientId, newCount) {
-  await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${clientId}`, {
-    method: "PATCH",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ loyalty_emails_sent: newCount }),
-  });
-}
-
-async function sendLoyaltyEmail(email, name) {
+async function sendLoyaltyEmail(clientEmail, name) {
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
@@ -46,7 +33,7 @@ async function sendLoyaltyEmail(email, name) {
     },
     body: JSON.stringify({
       from: FROM_EMAIL,
-      to: [email],
+      to: [clientEmail],
       subject: "You Earned a Reward! 💕✦ Acrylic Faerie",
       html: `
         <div style="font-family: Georgia, serif; max-width: 520px; margin: 0 auto; background: #0f0a0c; color: #f5e8ee; padding: 40px 32px;">
@@ -86,7 +73,8 @@ async function sendLoyaltyEmail(email, name) {
       `,
     }),
   });
-  return res.ok;
+  const data = await res.json();
+  return { ok: res.ok, data };
 }
 
 export default async function handler(req, res) {
@@ -105,8 +93,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const client = await getOrCreateClient(email, name);
+    const client = await getOrCreateClient(email);
     const newCount = (client.booking_count || 0) + 1;
+    const loyaltySent = client.loyalty_emails_sent || 0;
+    const rewardsEarned = Math.floor(newCount / 5);
 
     // Update booking count
     await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}`, {
@@ -119,45 +109,26 @@ export default async function handler(req, res) {
       body: JSON.stringify({ booking_count: newCount }),
     });
 
-    // Read fresh loyalty_emails_sent from DB to avoid stale data
-    const freshRes = await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}&select=loyalty_emails_sent`, {
-      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
-    });
-    const [freshClient] = await freshRes.json();
-    const loyaltySent = freshClient?.loyalty_emails_sent || 0;
-    const rewardsEarned = Math.floor(newCount / 5);
-
-    console.log("DEBUG:", { newCount, loyaltySent, rewardsEarned });
-
+    // Send reward if earned
     if (rewardsEarned > loyaltySent) {
-      try {
-        const emailRes = await fetch("https://api.resend.com/emails", {
-          method: "POST",
+      const { ok, data } = await sendLoyaltyEmail(email, name);
+      if (ok) {
+        await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}`, {
+          method: "PATCH",
           headers: {
-            "Authorization": `Bearer ${RESEND_API_KEY}`,
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            from: FROM_EMAIL,
-            to: ["acrylicfaerie.biz@gmail.com"], // temporary until domain verified
-          reply_to: email,
-            subject: "You Earned a Reward! Acrylic Faerie",
-            html: `<p>Hi ${name}! You have earned your loyalty reward — 20% off your next set + one free upgrade. Mention this email at your appointment!</p>`,
-          }),
+          body: JSON.stringify({ loyalty_emails_sent: rewardsEarned }),
         });
-        const emailData = await emailRes.json();
-        if (emailRes.ok) {
-          await updateLoyaltyEmailsSent(client.id, rewardsEarned);
-          return res.status(200).json({ message: "Loyalty reward sent!", booking_count: newCount, reward: true });
-        } else {
-          return res.status(200).json({ message: "Email failed", booking_count: newCount, reward: false, emailError: emailData });
-        }
-      } catch (emailErr) {
-        return res.status(200).json({ message: "Email error", booking_count: newCount, reward: false, emailError: emailErr.message });
+        return res.status(200).json({ message: "Loyalty reward sent!", booking_count: newCount, reward: true });
+      } else {
+        return res.status(200).json({ message: "Email failed", booking_count: newCount, reward: false, emailError: data });
       }
     }
 
-    return res.status(200).json({ message: "Booking count updated", booking_count: newCount, reward: false, debug: { newCount, loyaltySent, rewardsEarned } });
+    return res.status(200).json({ message: "Booking count updated", booking_count: newCount, reward: false });
 
   } catch (err) {
     return res.status(500).json({ error: err.message });
