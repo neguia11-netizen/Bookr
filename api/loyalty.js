@@ -108,6 +108,7 @@ export default async function handler(req, res) {
     const client = await getOrCreateClient(email, name);
     const newCount = (client.booking_count || 0) + 1;
 
+    // Update booking count
     await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}`, {
       method: "PATCH",
       headers: {
@@ -118,7 +119,12 @@ export default async function handler(req, res) {
       body: JSON.stringify({ booking_count: newCount }),
     });
 
-    const loyaltySent = client.loyalty_emails_sent || 0;
+    // Read fresh loyalty_emails_sent from DB to avoid stale data
+    const freshRes = await fetch(`${SUPABASE_URL}/rest/v1/clients?id=eq.${client.id}&select=loyalty_emails_sent`, {
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+    });
+    const [freshClient] = await freshRes.json();
+    const loyaltySent = freshClient?.loyalty_emails_sent || 0;
     const rewardsEarned = Math.floor(newCount / 5);
 
     if (rewardsEarned > loyaltySent) {
