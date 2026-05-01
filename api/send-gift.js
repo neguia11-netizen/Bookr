@@ -1,5 +1,5 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const FROM_EMAIL = "Acrylic Faerie <onboarding@resend.dev>";
+const FROM_EMAIL = "Acrylic Faerie <hello@acrylicfaerie.com>";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
