@@ -260,6 +260,8 @@ export default function Admin() {
   const [availYear, setAvailYear] = useState(new Date().getFullYear());
   const [sendingReminders, setSendingReminders] = useState(false);
   const [reminderResult, setReminderResult] = useState(null);
+  const [sendingRebooking, setSendingRebooking] = useState(false);
+  const [rebookingResult, setRebookingResult] = useState(null);
   const [inspoLightbox, setInspoLightbox] = useState(null);
   const [clients, setClients] = useState([]);
   const [sendingReward, setSendingReward] = useState(null);
@@ -372,6 +374,20 @@ export default function Admin() {
     return Object.entries(grouped).sort((x, y) => new Date(x[0]) - new Date(y[0]));
   }
 
+  async function handleSendRebooking() {
+    setSendingRebooking(true);
+    setRebookingResult(null);
+    try {
+      const res = await fetch("/api/send-rebooking?secret=faerie-rebooking-2024");
+      const data = await res.json();
+      setRebookingResult(data.message || "Done!");
+    } catch {
+      setRebookingResult("Something went wrong. Try again.");
+    } finally {
+      setSendingRebooking(false);
+    }
+  }
+
   async function handleSendReminders() {
     setSendingReminders(true);
     setReminderResult(null);
@@ -452,6 +468,10 @@ export default function Admin() {
                 {sendingReminders ? "Sending..." : "📱 Send Tomorrow's Reminders"}
               </button>
               {reminderResult && <span style={{fontSize:11,color:"var(--rose-lt)",letterSpacing:1}}>{reminderResult}</span>}
+              <button className="btn btn-primary btn-sm" disabled={sendingRebooking} onClick={handleSendRebooking} style={{background:"var(--green,#4a9a6a)"}}>
+                {sendingRebooking ? "Sending..." : "💌 Send Rebooking Reminders"}
+              </button>
+              {rebookingResult && <span style={{fontSize:11,color:"var(--rose-lt)",letterSpacing:1}}>{rebookingResult}</span>}
             </div>
           </div>
         </div>
