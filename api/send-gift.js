@@ -58,7 +58,6 @@ export default async function handler(req, res) {
             </div>
 
             <div style="text-align: center; border-top: 1px solid #3a1f2e; padding-top: 20px;">
-              <p style="font-size: 11px; color: #5a3a48; margin-bottom: 8px; letter-spacing: 1px;">📍 5623 Spring Moon St, San Antonio, TX 78247</p>
               <p style="font-size: 11px; color: #5a3a48; letter-spacing: 1px;">
                 <a href="https://instagram.com/acrylicfaerie" style="color: #7a2840;">@acrylicfaerie</a> ·
                 <a href="mailto:acrylicfaerie.biz@gmail.com" style="color: #7a2840;">acrylicfaerie.biz@gmail.com</a>
