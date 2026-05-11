@@ -414,6 +414,8 @@ export default function BeautyBooking() {
     localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingPhone", form.phone);
     localStorage.setItem("bookingNotes", form.notes || "");
+    // Generate a temp ID that will be matched after Stripe payment
+    localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingInspo", inspoFiles.map(f => f.url).filter(Boolean).join(","));
     setStep(4);
   }
@@ -708,6 +710,7 @@ export default function BeautyBooking() {
           <div style={{marginBottom:16,display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
             <a href="/giftcard" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Gift Cards ✦</a>
             <a href="/about" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ About Me ✦</a>
+            <a href="/naildesign" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ AI Nail Design ✦</a>
           </div>
           <p className="footer-email">© 2026 Acrylic Faerie · San Antonio, TX · <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
         </div>
