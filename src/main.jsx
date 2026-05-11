@@ -7,7 +7,6 @@ import Admin from './Admin.jsx'
 import GiftCard from './GiftCard.jsx'
 import GiftSuccess from './GiftSuccess.jsx'
 import About from './About.jsx'
-import NailDesignAI from './NailDesignAI.jsx'
 import Cancel from './Cancel.jsx'
 import Reschedule from './Reschedule.jsx'
 
@@ -21,8 +20,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     : path === '/giftcard' ? <GiftCard />
     : path === '/giftsuccess' ? <GiftSuccess />
     : path === '/about' ? <About />
-    : path === '/naildesign' ? <NailDesignAI />
-    : path === '/cancel' ? <Cancel />
+: path === '/cancel' ? <Cancel />
     : path === '/reschedule' ? <Reschedule />
     : <App />}
   </React.StrictMode>,
