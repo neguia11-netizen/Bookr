@@ -12,11 +12,13 @@ async function saveBooking(data) {
       "apikey": SUPABASE_KEY,
       "Authorization": `Bearer ${SUPABASE_KEY}`,
       "Content-Type": "application/json",
-      "Prefer": "return=minimal",
+      "Prefer": "return=representation",
     },
     body: JSON.stringify({ ...data, status: "paid" }),
   });
   if (!res.ok) throw new Error("Failed to save booking");
+  const [saved] = await res.json();
+  return saved;
 }
 
 
@@ -175,38 +177,41 @@ export default function Success() {
     if (service && date && time) {
       setBooking({ service, date, time, name, email, inspoUrls });
 
-      Promise.allSettled([
-        saveBooking({
-          service, date, time, duration, price,
-          client_name: name,
-          client_email: email,
-          client_phone: phone,
-          notes,
-          inspo_url: inspoUrls.join(',') || null,
-        }),
-        fetch("/api/send-confirmation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            secret: "faerie-confirm-2024",
-            booking: {
-              id: localStorage.getItem("bookingId") || "",
-              service, date, time, duration, price,
-              client_name: name,
-              client_email: email,
-              client_phone: phone,
-              notes: notes || "",
-              inspo_url: inspoRaw || "",
-            }
+      // Save booking first to get ID, then send confirmation
+      saveBooking({
+        service, date, time, duration, price,
+        client_name: name,
+        client_email: email,
+        client_phone: phone,
+        notes,
+        inspo_url: inspoUrls.join(',') || null,
+      }).then(saved => {
+        const bookingId = saved?.id || "";
+        Promise.allSettled([
+          fetch("/api/send-confirmation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              secret: "faerie-confirm-2024",
+              booking: {
+                id: bookingId,
+                service, date, time, duration, price,
+                client_name: name,
+                client_email: email,
+                client_phone: phone,
+                notes: notes || "",
+                inspo_url: inspoUrls.join(',') || "",
+              }
+            }),
           }),
-        }),
-        // Track loyalty points
-        fetch("/api/loyalty", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, name, secret: "faerie-loyalty-2024" }),
-        }),
-      ]);
+          // Track loyalty points
+          fetch("/api/loyalty", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, name, secret: "faerie-loyalty-2024" }),
+          }),
+        ]);
+      }).catch(err => console.error("Booking save error:", err));
 
       localStorage.clear();
     }
