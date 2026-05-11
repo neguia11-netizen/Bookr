@@ -219,6 +219,15 @@ const styles = `
   .send-reward-btn:hover { background: var(--rose); color: white; border-color: var(--rose); }
   .send-reward-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  .reschedule-modal { position: fixed; inset: 0; z-index: 200; background: rgba(10,5,8,0.92); display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .reschedule-card { background: var(--bg2); border: 1px solid var(--border2); max-width: 420px; width: 100%; padding: 28px; position: relative; }
+  .reschedule-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--rose-dim), var(--rose), var(--rose-dim)); }
+  .reschedule-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; color: var(--text); margin-bottom: 6px; }
+  .reschedule-sub { font-size: 11px; color: var(--dim); letter-spacing: 1px; margin-bottom: 20px; }
+  .reschedule-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .reschedule-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .reschedule-input { background: var(--bg); border: 1px solid var(--border); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 14px; outline: none; border-radius: 2px; }
+  .reschedule-input:focus { border-color: var(--rose-dim); }
   .avail-panel { padding: 24px; }
   .avail-title { font-family: 'Playfair Display', serif; font-size: 20px; font-style: italic; margin-bottom: 16px; }
   .avail-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
@@ -263,6 +272,10 @@ export default function Admin() {
   const [sendingRebooking, setSendingRebooking] = useState(false);
   const [rebookingResult, setRebookingResult] = useState(null);
   const [inspoLightbox, setInspoLightbox] = useState(null);
+  const [rescheduling, setRescheduling] = useState(null); // booking id
+  const [newDate, setNewDate] = useState("");
+  const [newTime, setNewTime] = useState("");
+  const [savingReschedule, setSavingReschedule] = useState(false);
   const [clients, setClients] = useState([]);
   const [sendingReward, setSendingReward] = useState(null);
   const [rewardResult, setRewardResult] = useState({});
@@ -372,6 +385,31 @@ export default function Admin() {
       }
     });
     return Object.entries(grouped).sort((x, y) => new Date(x[0]) - new Date(y[0]));
+  }
+
+  async function handleReschedule(booking) {
+    if (!newDate || !newTime) return;
+    setSavingReschedule(true);
+    const d = new Date(newDate + "T12:00:00");
+    const dateStr = `${MONTHS[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings?id=eq.${booking.id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ date: dateStr, time: newTime }),
+      });
+      if (res.ok) {
+        setBookings(prev => prev.map(b => b.id === booking.id ? { ...b, date: dateStr, time: newTime } : b));
+        setRescheduling(null);
+        setNewDate("");
+        setNewTime("");
+      }
+    } catch { }
+    finally { setSavingReschedule(false); }
   }
 
   async function handleSendRebooking() {
@@ -569,6 +607,7 @@ export default function Admin() {
                           </div>
                         : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel Booking</button>
                       }
+                      <button className="btn-ghost btn" style={{fontSize:10,padding:"6px 14px"}} onClick={() => { setRescheduling(b.id); setNewDate(""); setNewTime(""); }}>Reschedule</button>
                     </div>
                   </div>
                 );
@@ -624,6 +663,7 @@ export default function Admin() {
                             </div>
                           : <button className="btn-danger" onClick={() => setConfirmDelete(b.id)}>Cancel</button>
                         }
+                        <button className="btn-ghost btn" style={{fontSize:10,padding:"5px 10px",marginTop:4,width:"100%"}} onClick={() => { setRescheduling(b.id); setNewDate(""); setNewTime(""); }}>Reschedule</button>
                       </td>
                     </tr>
                   );
@@ -793,6 +833,39 @@ export default function Admin() {
             </div>
           </div>
         )}
+      {rescheduling && (() => {
+        const booking = bookings.find(b => b.id === rescheduling);
+        if (!booking) return null;
+        return (
+          <div className="reschedule-modal" onClick={() => setRescheduling(null)}>
+            <div className="reschedule-card" onClick={e => e.stopPropagation()}>
+              <div className="reschedule-title">Reschedule Appointment</div>
+              <div className="reschedule-sub">{booking.client_name} · {booking.service}</div>
+              <div style={{fontSize:12,color:"var(--muted)",marginBottom:16,padding:"8px 12px",background:"var(--bg)",border:"1px solid var(--border)",borderRadius:2}}>
+                Current: <strong style={{color:"var(--rose-lt)"}}>{booking.date} at {booking.time}</strong>
+              </div>
+              <div className="reschedule-field">
+                <label className="reschedule-label">New Date</label>
+                <input type="date" className="reschedule-input" value={newDate} onChange={e => setNewDate(e.target.value)} />
+              </div>
+              <div className="reschedule-field">
+                <label className="reschedule-label">New Time</label>
+                <select className="reschedule-input" value={newTime} onChange={e => setNewTime(e.target.value)}>
+                  <option value="">Select a time</option>
+                  {TIME_OPTIONS.map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+              </div>
+              <div style={{display:"flex",gap:10,marginTop:8}}>
+                <button className="btn btn-primary btn-sm" disabled={!newDate || !newTime || savingReschedule} onClick={() => handleReschedule(booking)} style={{flex:2}}>
+                  {savingReschedule ? "Saving..." : "Confirm Reschedule ✦"}
+                </button>
+                <button className="btn btn-ghost" onClick={() => setRescheduling(null)} style={{flex:1}}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       </div>
     </>
   );
