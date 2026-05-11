@@ -3,10 +3,7 @@ import { useState, useEffect } from "react";
 const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
 
-const EMAILJS_SERVICE_ID = "service_qj22hlr";
-const EMAILJS_TEMPLATE_ID = "template_pp8uavo";
-const EMAILJS_CLIENT_TEMPLATE_ID = "template_0az8fc7";
-const EMAILJS_PUBLIC_KEY = "ga_ZOXpSGY692r6cR";
+
 
 async function saveBooking(data) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
@@ -22,24 +19,7 @@ async function saveBooking(data) {
   if (!res.ok) throw new Error("Failed to save booking");
 }
 
-async function sendEmailToTemplate(templateId, params) {
-  const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      service_id: EMAILJS_SERVICE_ID,
-      template_id: templateId,
-      user_id: EMAILJS_PUBLIC_KEY,
-      template_params: params,
-    }),
-  });
-  if (!res.ok) throw new Error("Email failed");
-}
 
-async function sendEmail(params) {
-  await sendEmailToTemplate(EMAILJS_TEMPLATE_ID, params);
-  await sendEmailToTemplate(EMAILJS_CLIENT_TEMPLATE_ID, params);
-}
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
@@ -204,12 +184,21 @@ export default function Success() {
           notes,
           inspo_url: inspoUrls.join(',') || null,
         }),
-        sendEmail({
-          service, date, time, duration, price,
-          client_name: name,
-          client_email: email,
-          client_phone: phone,
-          notes: notes || "None",
+        fetch("/api/send-confirmation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            secret: "faerie-confirm-2024",
+            booking: {
+              id: localStorage.getItem("bookingId") || "",
+              service, date, time, duration, price,
+              client_name: name,
+              client_email: email,
+              client_phone: phone,
+              notes: notes || "",
+              inspo_url: inspoRaw || "",
+            }
+          }),
         }),
         // Track loyalty points
         fetch("/api/loyalty", {
