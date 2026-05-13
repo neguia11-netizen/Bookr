@@ -277,6 +277,7 @@ export default function Admin() {
   const [newTime, setNewTime] = useState("");
   const [savingReschedule, setSavingReschedule] = useState(false);
   const [clients, setClients] = useState([]);
+  const [pressOnOrders, setPressOnOrders] = useState([]);
   const [sendingReward, setSendingReward] = useState(null);
   const [rewardResult, setRewardResult] = useState({});
 
@@ -288,9 +289,12 @@ export default function Admin() {
   async function loadBookings() {
     setLoading(true);
     try {
-      const [data, blocked, avail, clientsData] = await Promise.all([
+      const [data, blocked, avail, clientsData, pressOnData] = await Promise.all([
         fetchBookings(), fetchBlockedDates(), fetchAvailability(),
         fetch(`${SUPABASE_URL}/rest/v1/clients?select=*&order=booking_count.desc`, {
+          headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+        }).then(r => r.json()).catch(() => []),
+        fetch(`${SUPABASE_URL}/rest/v1/press_on_orders?select=*&order=created_at.desc`, {
           headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
         }).then(r => r.json()).catch(() => [])
       ]);
@@ -298,6 +302,7 @@ export default function Admin() {
       setBlockedDates(blocked);
       setAvailability(avail);
       setClients(clientsData);
+      setPressOnOrders(pressOnData);
     } catch { }
     finally { setLoading(false); }
   }
@@ -521,6 +526,7 @@ export default function Admin() {
             <button className={`tab ${tab === "availability" ? "active" : ""}`} onClick={() => setTab("availability")}>Availability</button>
             <button className={`tab ${tab === "blocked" ? "active" : ""}`} onClick={() => setTab("blocked")}>Block Dates</button>
             <button className={`tab ${tab === "loyalty" ? "active" : ""}`} onClick={() => setTab("loyalty")}>Loyalty</button>
+            <button className={`tab ${tab === "pressons" ? "active" : ""}`} onClick={() => setTab("pressons")}>Press-Ons</button>
           </div>
         </div>
 
@@ -793,6 +799,63 @@ export default function Admin() {
                   </div>
                 );
               })}
+            </div>
+          </div>
+        )}
+
+
+        {!loading && tab === "pressons" && (
+          <div className="list-panel">
+            <h3 className="list-title">Press-On Orders</h3>
+            <p style={{fontSize:12,color:"var(--muted)",marginBottom:20,letterSpacing:0.5}}>
+              {pressOnOrders.length} order{pressOnOrders.length !== 1 ? "s" : ""} total
+            </p>
+            {pressOnOrders.length === 0 && <p style={{fontSize:13,color:"var(--dim)",letterSpacing:1}}>No press-on orders yet.</p>}
+            <div style={{display:"flex",flexDirection:"column",gap:10}}>
+              {pressOnOrders.map(o => (
+                <div key={o.id} style={{background:"var(--bg2)",border:"1px solid var(--border)",padding:"20px 24px",position:"relative"}}>
+                  <div style={{position:"absolute",top:0,left:0,right:0,height:2,background:o.status==="paid"?"var(--green)":"var(--amber)"}} />
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12,flexWrap:"wrap",gap:8}}>
+                    <div>
+                      <div style={{fontSize:15,color:"var(--text)",fontWeight:400,marginBottom:2}}>{o.client_name}</div>
+                      <div style={{fontSize:11,color:"var(--dim)"}}>{o.client_email} · {o.client_phone}</div>
+                    </div>
+                    <div style={{display:"flex",gap:8,alignItems:"center"}}>
+                      <span style={{fontSize:16,color:"var(--rose-lt)",fontFamily:"Playfair Display,serif",fontStyle:"italic"}}>${(o.total/100).toFixed(2)}</span>
+                      <span className={`booking-status ${o.status}`}>{o.status}</span>
+                    </div>
+                  </div>
+                  <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:8,marginBottom:12}}>
+                    <div style={{fontSize:12,color:"var(--muted)"}}>💅 <strong style={{color:"var(--text)"}}>{o.material}</strong></div>
+                    <div style={{fontSize:12,color:"var(--muted)"}}>🔷 <strong style={{color:"var(--text)"}}>{o.shape}</strong></div>
+                    <div style={{fontSize:12,color:"var(--muted)"}}>📏 <strong style={{color:"var(--text)"}}>{o.length}</strong></div>
+                    <div style={{fontSize:12,color:"var(--muted)"}}>📦 <strong style={{color:"var(--text)"}}>{o.delivery === "shipping" ? "Shipping" : "Pickup"}</strong></div>
+                  </div>
+                  {o.addons && <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>✨ Add-ons: <strong style={{color:"var(--text)"}}>{o.addons}</strong></div>}
+                  {o.shipping_address && (
+                    <div style={{background:"#200e18",border:"1px solid var(--rose-dim)",padding:"8px 12px",marginBottom:8,borderRadius:2}}>
+                      <span style={{fontSize:10,letterSpacing:2,textTransform:"uppercase",color:"var(--rose)",marginRight:8}}>Ship To</span>
+                      <span style={{fontSize:13,color:"var(--rose-lt)"}}>{o.shipping_address}</span>
+                    </div>
+                  )}
+                  {o.notes && <div style={{fontSize:12,color:"var(--muted)",marginBottom:8}}>📝 {o.notes}</div>}
+                  {o.nail_sizes && (
+                    <div style={{fontSize:11,color:"var(--dim)",marginBottom:8}}>
+                      <span style={{color:"var(--muted)",letterSpacing:1,textTransform:"uppercase",fontSize:10}}>Sizes · </span>
+                      L: {["thumb","index","middle","ring","pinky"].map(f => o.nail_sizes?.left?.[f] || "?").join("-")} &nbsp;|&nbsp;
+                      R: {["thumb","index","middle","ring","pinky"].map(f => o.nail_sizes?.right?.[f] || "?").join("-")}
+                    </div>
+                  )}
+                  {o.inspo_url && (
+                    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8}}>
+                      {o.inspo_url.split(",").filter(Boolean).map((url, i) => (
+                        <img key={i} src={url} alt={`Inspo ${i+1}`} style={{width:56,height:56,objectFit:"cover",border:"1px solid var(--border2)",borderRadius:2,cursor:"pointer"}} onClick={() => setInspoLightbox(url)} />
+                      ))}
+                    </div>
+                  )}
+                  <div style={{fontSize:11,color:"var(--dim)",marginTop:8}}>Ordered: {new Date(o.created_at).toLocaleDateString()}</div>
+                </div>
+              ))}
             </div>
           </div>
         )}
