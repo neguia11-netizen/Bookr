@@ -9,6 +9,8 @@ import GiftSuccess from './GiftSuccess.jsx'
 import About from './About.jsx'
 import Cancel from './Cancel.jsx'
 import Reschedule from './Reschedule.jsx'
+import PressOns from './PressOns.jsx'
+import PressOnSuccess from './PressOnSuccess.jsx'
 
 const path = window.location.pathname;
 
@@ -20,8 +22,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     : path === '/giftcard' ? <GiftCard />
     : path === '/giftsuccess' ? <GiftSuccess />
     : path === '/about' ? <About />
-: path === '/cancel' ? <Cancel />
+    : path === '/cancel' ? <Cancel />
     : path === '/reschedule' ? <Reschedule />
+    : path === '/pressons' ? <PressOns />
+    : path === '/pressonsuccess' ? <PressOnSuccess />
     : <App />}
   </React.StrictMode>,
 )
