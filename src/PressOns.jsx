@@ -338,21 +338,14 @@ export default function PressOns() {
               <p className="section-sub">Use the tape method to measure — sizes 0 (largest) to 9 (smallest)</p>
 
               <div className="sizing-chart">
-                <span className="sizing-chart-title">Size Reference Chart</span>
-                <div className="sizing-chart-grid">
-                  {[
-                    {n:"0",mm:"18"},{n:"1",mm:"16"},{n:"2",mm:"15"},{n:"3",mm:"14"},
-                    {n:"4",mm:"13"},{n:"5",mm:"12"},{n:"6",mm:"11"},{n:"7",mm:"10"},
-                    {n:"8",mm:"9"},{n:"9",mm:"8"}
-                  ].map(s => (
-                    <div key={s.n} className="size-chip">
-                      <span style={{fontSize:14,color:"var(--text)",fontWeight:500}}>{s.n}</span>
-                      <span className="size-mm">{s.mm}mm</span>
-                    </div>
-                  ))}
-                </div>
-                <p style={{fontSize:11,color:"var(--dim)",marginTop:12,lineHeight:1.6}}>
-                  📏 How to measure: Place tape over nail → press sidewalls → mark both sides → measure flat in mm
+                <span className="sizing-chart-title">How to Measure Your Nails</span>
+                <img
+                  src="/sizing-chart.jpg"
+                  alt="Nail sizing chart — how to measure using tape"
+                  style={{width:"100%",display:"block",borderRadius:2,marginBottom:12,border:"1px solid var(--border)"}}
+                />
+                <p style={{fontSize:11,color:"var(--dim)",lineHeight:1.6}}>
+                  📏 Use transparent tape, press sidewalls, mark both sides, remove and measure flat in mm. Then match to size 0–9 above.
                 </p>
               </div>
 
