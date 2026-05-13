@@ -31,14 +31,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get order from Supabase
     const orderRes = await fetch(`${SUPABASE_URL}/rest/v1/press_on_orders?id=eq.${orderId}&select=*`, {
       headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
     });
     const [order] = await orderRes.json();
     if (!order) return res.status(404).json({ error: "Order not found" });
 
-    // Update status to paid
     await fetch(`${SUPABASE_URL}/rest/v1/press_on_orders?id=eq.${orderId}`, {
       method: "PATCH",
       headers: {
@@ -52,8 +50,10 @@ export default async function handler(req, res) {
     const inspoLinks = order.inspo_url ? order.inspo_url.split(",").filter(Boolean) : [];
     const sizes = order.nail_sizes || {};
     const totalFormatted = `$${(order.total / 100).toFixed(2)}`;
+    const firstName = (order.client_name || "there").split(" ")[0];
+    const isShipping = order.delivery === "shipping";
 
-    // Send client confirmation
+    // CLIENT EMAIL - no shipping address
     await sendEmail(
       order.client_email,
       "Press-On Order Confirmed! 💕 Acrylic Faerie",
@@ -68,7 +68,7 @@ export default async function handler(req, res) {
             <p style="font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: white; margin: 0;">✦ Order Confirmed ✦</p>
           </div>
           <div style="padding: 32px;">
-            <p style="font-size: 15px; color: #f5e8ee; line-height: 1.8; margin: 0 0 24px;">Hi <strong>${order.client_name.split(' ')[0]}</strong>! 💕<br/>Your press-on order has been received and paid. Angie will begin working on your set soon!</p>
+            <p style="font-size: 15px; color: #f5e8ee; line-height: 1.8; margin: 0 0 24px;">Hi <strong>${firstName}</strong>! 💕<br/>Your press-on order has been received and paid. Angie will begin working on your custom set soon!</p>
             <div style="background: #1a1015; border: 1px solid #4d2a3d; padding: 24px; margin-bottom: 20px; position: relative;">
               <div style="height: 2px; background: linear-gradient(90deg, #7a2840, #c4415a, #7a2840); position: absolute; top: 0; left: 0; right: 0;"></div>
               <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 16px;">Order Details</p>
@@ -77,15 +77,14 @@ export default async function handler(req, res) {
                 <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Shape</td><td style="padding: 8px 0; font-size: 14px; color: #f5e8ee;">${order.shape}</td></tr>
                 <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Length</td><td style="padding: 8px 0; font-size: 14px; color: #f5e8ee;">${order.length}</td></tr>
                 ${order.addons ? `<tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Add-ons</td><td style="padding: 8px 0; font-size: 14px; color: #f5e8ee;">${order.addons}</td></tr>` : ''}
-                <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Pickup/Delivery</td><td style="padding: 8px 0; font-size: 14px; color: #f5e8ee;">${order.delivery}</td></tr>
+                <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Fulfillment</td><td style="padding: 8px 0; font-size: 14px; color: #f5e8ee;">${isShipping ? 'Shipping' : 'Pickup'}</td></tr>
                 <tr><td style="padding: 8px 0; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Total Paid</td><td style="padding: 8px 0; font-size: 16px; color: #e8839a; font-style: italic;">${totalFormatted} ✦</td></tr>
               </table>
             </div>
-            ${order.notes ? `<div style="background: #1a1015; border: 1px solid #3a1f2e; padding: 16px 20px; margin-bottom: 20px;"><p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 8px;">Your Notes</p><p style="font-size: 13px; color: #9a7080;">${order.notes}</p></div>` : ''}
             <div style="background: #1a1015; border: 1px solid #3a1f2e; padding: 16px 20px; margin-bottom: 24px;">
-              <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 12px;">What's Next</p>
+              <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 10px;">What Happens Next</p>
               <p style="font-size: 13px; color: #9a7080; line-height: 1.8; margin: 0 0 6px;">✦ Angie will review your order and inspo photos</p>
-              <p style="font-size: 13px; color: #9a7080; line-height: 1.8; margin: 0 0 6px;">✦ She'll reach out if she has any questions</p>
+              <p style="font-size: 13px; color: #9a7080; line-height: 1.8; margin: 0 0 6px;">✦ She'll reach out if she has any questions about your design</p>
               <p style="font-size: 13px; color: #9a7080; line-height: 1.8; margin: 0;">✦ Questions? DM <a href="https://instagram.com/acrylicfaerie" style="color: #e8839a;">@acrylicfaerie</a> or email <a href="mailto:acrylicfaerie.biz@gmail.com" style="color: #e8839a;">acrylicfaerie.biz@gmail.com</a></p>
             </div>
             <div style="text-align: center;">
@@ -99,7 +98,7 @@ export default async function handler(req, res) {
       `
     );
 
-    // Send owner notification
+    // OWNER EMAIL - includes shipping address
     await sendEmail(
       OWNER_EMAIL,
       `New Press-On Order: ${order.client_name} — ${order.length} ${order.shape} (${order.material})`,
@@ -117,9 +116,10 @@ export default async function handler(req, res) {
               <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Shape</td><td style="padding: 10px 14px; font-size: 14px; color: #f5e8ee;">${order.shape}</td></tr>
               <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Length</td><td style="padding: 10px 14px; font-size: 14px; color: #e8839a; font-style: italic;">${order.length}</td></tr>
               ${order.addons ? `<tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Add-ons</td><td style="padding: 10px 14px; font-size: 14px; color: #f5e8ee;">${order.addons}</td></tr>` : ''}
-              <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Delivery</td><td style="padding: 10px 14px; font-size: 14px; color: #f5e8ee;">${order.delivery}</td></tr>
-              <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Total</td><td style="padding: 10px 14px; font-size: 16px; color: #e8839a; font-style: italic;">${totalFormatted}</td></tr>
+              <tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Fulfillment</td><td style="padding: 10px 14px; font-size: 14px; color: #f5e8ee;">${isShipping ? 'Shipping (+$5)' : 'Pickup (Free)'}</td></tr>
+              ${order.shipping_address ? `<tr style="border-bottom: 1px solid #3a1f2e; background: #200e18;"><td style="padding: 12px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #c4415a;">📦 Ship To</td><td style="padding: 12px 14px; font-size: 15px; color: #e8839a; font-weight: bold;">${order.shipping_address}</td></tr>` : ''}
               ${order.notes ? `<tr style="border-bottom: 1px solid #3a1f2e;"><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Notes</td><td style="padding: 10px 14px; font-size: 13px; color: #9a7080;">${order.notes}</td></tr>` : ''}
+              <tr><td style="padding: 10px 14px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9a7080;">Total</td><td style="padding: 10px 14px; font-size: 16px; color: #e8839a; font-style: italic;">${totalFormatted}</td></tr>
             </table>
 
             ${Object.keys(sizes).length > 0 ? `
@@ -127,18 +127,18 @@ export default async function handler(req, res) {
               <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 12px;">Nail Sizes</p>
               <table style="width: 100%; border-collapse: collapse;">
                 <tr>
-                  <td style="font-size: 11px; color: #9a7080; padding: 4px 8px; text-align: center;">Left Hand</td>
-                  <td style="font-size: 11px; color: #9a7080; padding: 4px 8px; text-align: center;">Right Hand</td>
+                  <td style="font-size: 11px; color: #9a7080; padding: 4px 8px; text-align: center; width: 50%;">Left Hand</td>
+                  <td style="font-size: 11px; color: #9a7080; padding: 4px 8px; text-align: center; width: 50%;">Right Hand</td>
                 </tr>
                 <tr>
-                  <td style="padding: 8px;">
+                  <td style="padding: 8px; vertical-align: top;">
                     <table style="width:100%">
-                      ${['thumb','index','middle','ring','pinky'].map(f => `<tr><td style="font-size:11px;color:#9a7080;padding:2px 4px">${f}</td><td style="font-size:13px;color:#f5e8ee;padding:2px 4px">${sizes.left?.[f] ?? '—'}</td></tr>`).join('')}
+                      ${['thumb','index','middle','ring','pinky'].map(f => `<tr><td style="font-size:11px;color:#9a7080;padding:3px 6px;text-transform:capitalize">${f}</td><td style="font-size:14px;color:#f5e8ee;padding:3px 6px;font-weight:bold">${sizes.left && sizes.left[f] !== undefined ? sizes.left[f] : '—'}</td></tr>`).join('')}
                     </table>
                   </td>
-                  <td style="padding: 8px;">
+                  <td style="padding: 8px; vertical-align: top;">
                     <table style="width:100%">
-                      ${['thumb','index','middle','ring','pinky'].map(f => `<tr><td style="font-size:11px;color:#9a7080;padding:2px 4px">${f}</td><td style="font-size:13px;color:#f5e8ee;padding:2px 4px">${sizes.right?.[f] ?? '—'}</td></tr>`).join('')}
+                      ${['thumb','index','middle','ring','pinky'].map(f => `<tr><td style="font-size:11px;color:#9a7080;padding:3px 6px;text-transform:capitalize">${f}</td><td style="font-size:14px;color:#f5e8ee;padding:3px 6px;font-weight:bold">${sizes.right && sizes.right[f] !== undefined ? sizes.right[f] : '—'}</td></tr>`).join('')}
                     </table>
                   </td>
                 </tr>
@@ -148,7 +148,7 @@ export default async function handler(req, res) {
             ${inspoLinks.length > 0 ? `
             <div style="background: #1a1015; border: 1px solid #3a1f2e; padding: 16px 20px; margin-bottom: 20px;">
               <p style="font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: #c4415a; margin: 0 0 12px;">Inspo Photos</p>
-              ${inspoLinks.map(url => `<a href="${url}" style="color: #e8839a; display: block; margin-bottom: 6px; font-size: 13px;">View Photo ↗</a>`).join('')}
+              ${inspoLinks.map((url, i) => `<a href="${url}" style="color: #e8839a; display: block; margin-bottom: 6px; font-size: 13px;">View Photo ${i + 1} ↗</a>`).join('')}
             </div>` : ''}
 
             <div style="text-align: center;">
