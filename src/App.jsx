@@ -451,8 +451,9 @@ export default function BeautyBooking() {
           <h1><span>Acrylic</span> Faerie</h1>
           <p className="header-sub">San Antonio · Home Based Nail Technician</p>
           <div className="header-divider">Book Your Appointment</div>
-          <div style={{marginTop:18,display:"flex",justifyContent:"center"}}>
+          <div style={{marginTop:18,display:"flex",justifyContent:"center",gap:12,flexWrap:"wrap"}}>
             <a href="/portfolio" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18"}}>✦ View Gallery ✦</a>
+            <a href="/pressons" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18"}}>💅 Order Press-Ons ✦</a>
           </div>
         </div>
 
@@ -471,6 +472,13 @@ export default function BeautyBooking() {
             <>
               <h2 className="section-title">Choose a Service</h2>
               <p className="section-sub">Select one or more services to continue</p>
+              <div style={{background:"#200e18",border:"1px solid var(--rose-dim)",padding:"14px 20px",marginBottom:24,borderRadius:2,display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+                <div>
+                  <p style={{fontSize:13,color:"var(--rose-lt)",fontWeight:400,marginBottom:4}}>💅 Want custom press-on nails?</p>
+                  <p style={{fontSize:12,color:"var(--muted)"}}>Builder Gel or Acrylic · Custom sizes · Starting at $20</p>
+                </div>
+                <a href="/pressons" style={{fontSize:11,letterSpacing:2,textTransform:"uppercase",color:"white",textDecoration:"none",padding:"10px 20px",background:"var(--rose)",borderRadius:2,flexShrink:0,whiteSpace:"nowrap"}}>Order Now →</a>
+              </div>
               {categories.map(cat => (
                 <div key={cat}>
                   <div className="category-label">{cat}</div>
