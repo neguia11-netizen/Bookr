@@ -6,9 +6,10 @@
     { "source": "/giftcard", "destination": "/" },
     { "source": "/giftsuccess", "destination": "/" },
     { "source": "/about", "destination": "/" },
-    { "source": "/naildesign", "destination": "/" },
     { "source": "/cancel", "destination": "/" },
     { "source": "/reschedule", "destination": "/" },
+    { "source": "/pressons", "destination": "/" },
+    { "source": "/pressonsuccess", "destination": "/" },
     { "source": "/(.*)", "destination": "/" }
   ]
 }
