@@ -235,7 +235,7 @@ export default function PressOns() {
     material && shape && length,
     true, // addons optional
     Object.values(nailSizes.left).every(v => v) && Object.values(nailSizes.right).every(v => v),
-    form.name && form.email && form.phone,
+    form.name && form.email && form.phone && form.notes.trim() && inspoFiles.length > 0,
     true,
   ];
 
@@ -404,15 +404,15 @@ export default function PressOns() {
                   </div>
                 </div>
                 <div className="form-field full">
-                  <label className="form-label">Design Notes (optional)</label>
+                  <label className="form-label">Design Notes <span style={{color:"var(--rose)"}}>*</span></label>
                   <textarea className="form-input" placeholder="Describe your vision, colors, vibe, any specific details..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
                 </div>
                 <div className="form-field full">
-                  <label className="form-label">Inspo Photos (optional)</label>
+                  <label className="form-label">Inspo Photos <span style={{color:"var(--rose)"}}>*</span></label>
                   <div className="inspo-drop">
                     <input type="file" accept="image/*" multiple onChange={e => e.target.files.length > 0 && handleInspoUpload(e.target.files)} />
                     <p className="inspo-drop-text">Tap to upload · <span>Browse photos</span></p>
-                    <p style={{fontSize:11,color:"var(--dim)",marginTop:4}}>Select multiple photos · JPG, PNG, HEIC</p>
+                    <p style={{fontSize:11,color:"var(--dim)",marginTop:4}}>Required · Select multiple photos · JPG, PNG, HEIC</p>
                   </div>
                   {inspoUploading && <p style={{fontSize:11,color:"var(--muted)",marginTop:6}}>Uploading...</p>}
                   {inspoFiles.length > 0 && (
