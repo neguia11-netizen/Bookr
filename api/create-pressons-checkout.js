@@ -14,7 +14,7 @@ export default async function handler(req, res) {
     clientName, clientEmail, clientPhone,
     material, shape, length, addons,
     nailSizes, notes, inspoUrls,
-    total, delivery
+    total, delivery, shippingAddress
   } = req.body || {};
 
   if (!clientEmail || !total) {
@@ -87,6 +87,7 @@ export default async function handler(req, res) {
         notes, delivery,
         inspo_url: inspoUrls?.join(",") || "",
         total,
+        shipping_address: shippingAddress || null,
         status: "pending",
       }),
     });
