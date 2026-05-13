@@ -168,7 +168,7 @@ export default function PressOns() {
   function calcTotal() {
     const base = PRICES[length] || 0;
     const addons = selectedAddons.length * ADDON_PRICE;
-    const del = delivery === "delivery" ? DELIVERY_FEE : 0;
+    const del = delivery === "shipping" ? DELIVERY_FEE : 0;
     return base + addons + del;
   }
 
@@ -219,6 +219,7 @@ export default function PressOns() {
           nailSizes, notes: form.notes,
           inspoUrls: inspoFiles.map(f => f.url).filter(Boolean),
           total, delivery,
+          shippingAddress: delivery === "shipping" ? `${form.address}, ${form.city}, ${form.state} ${form.zip}` : null,
         }),
       });
       const data = await res.json();
@@ -235,7 +236,7 @@ export default function PressOns() {
     material && shape && length,
     true, // addons optional
     Object.values(nailSizes.left).every(v => v) && Object.values(nailSizes.right).every(v => v),
-    form.name && form.email && form.phone && form.notes.trim() && inspoFiles.length > 0,
+    form.name && form.email && form.phone && form.notes.trim() && inspoFiles.length > 0 && (delivery !== "shipping" || (form.address && form.city && form.state && form.zip)),
     true,
   ];
 
@@ -397,12 +398,37 @@ export default function PressOns() {
                       <div className="delivery-label">Pickup</div>
                       <div className="delivery-sub">Free · San Antonio</div>
                     </div>
-                    <div className={`delivery-option ${delivery === "delivery" ? "selected" : ""}`} onClick={() => setDelivery("delivery")}>
+                    <div className={`delivery-option ${delivery === "shipping" ? "selected" : ""}`} onClick={() => setDelivery("shipping")}>
                       <div className="delivery-label">Delivery</div>
                       <div className="delivery-sub">+$5 · San Antonio only</div>
                     </div>
                   </div>
                 </div>
+                {delivery === "shipping" && (
+                  <>
+                    <div className="form-field full" style={{background:"var(--bg)",border:"1px solid var(--border2)",padding:"16px",borderRadius:2,gridColumn:"1/-1"}}>
+                      <p style={{fontSize:10,letterSpacing:3,textTransform:"uppercase",color:"var(--rose)",marginBottom:14}}>Shipping Address</p>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+                        <div className="form-field full" style={{gridColumn:"1/-1"}}>
+                          <label className="form-label">Street Address</label>
+                          <input className="form-input" placeholder="123 Main St, Apt 4B" value={form.address || ""} onChange={e => setForm({...form, address: e.target.value})} />
+                        </div>
+                        <div className="form-field">
+                          <label className="form-label">City</label>
+                          <input className="form-input" placeholder="San Antonio" value={form.city || ""} onChange={e => setForm({...form, city: e.target.value})} />
+                        </div>
+                        <div className="form-field">
+                          <label className="form-label">State</label>
+                          <input className="form-input" placeholder="TX" value={form.state || ""} onChange={e => setForm({...form, state: e.target.value})} />
+                        </div>
+                        <div className="form-field">
+                          <label className="form-label">ZIP Code</label>
+                          <input className="form-input" placeholder="78247" value={form.zip || ""} onChange={e => setForm({...form, zip: e.target.value})} />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className="form-field full">
                   <label className="form-label">Design Notes <span style={{color:"var(--rose)"}}>*</span></label>
                   <textarea className="form-input" placeholder="Describe your vision, colors, vibe, any specific details..." value={form.notes} onChange={e => setForm({...form, notes: e.target.value})} />
@@ -443,7 +469,7 @@ export default function PressOns() {
                     <span className="summary-val">{selectedAddons.map(id => ADDONS.find(a => a.id === id)?.label).join(", ")}</span>
                   </div>
                 )}
-                <div className="summary-row"><span className="summary-key">Pickup/Delivery</span><span className="summary-val">{delivery === "delivery" ? "Delivery (+$5)" : "Pickup (Free)"}</span></div>
+                <div className="summary-row"><span className="summary-key">Pickup/Delivery</span><span className="summary-val">{delivery === "shipping" ? "Delivery (+$5)" : "Pickup (Free)"}</span></div>
                 <div className="summary-row"><span className="summary-key">Name</span><span className="summary-val">{form.name}</span></div>
                 <div className="summary-row"><span className="summary-key">Email</span><span className="summary-val">{form.email}</span></div>
                 <div className="summary-row"><span className="summary-key">Phone</span><span className="summary-val">{form.phone}</span></div>
