@@ -103,7 +103,9 @@ export default function Reschedule() {
   }
 
   function isPast(day) {
-    return new Date(calYear, calMonth, day) <= new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const selected = new Date(calYear, calMonth, day);
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    return selected < tomorrow;
   }
 
   const daysInMonth = getDaysInMonth(calYear, calMonth);
