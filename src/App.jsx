@@ -394,7 +394,12 @@ export default function BeautyBooking() {
   for (let d = 1; d <= daysInMonth; d++) calDays.push({ day: d, current: true });
 
   const isToday = (d) => d === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
-  const isPast = (d) => new Date(calYear, calMonth, d) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  // Require at least 24 hours notice — block today and anything before today
+  const isPast = (d) => {
+    const selected = new Date(calYear, calMonth, d);
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    return selected < tomorrow;
+  };
 
   const canProceed = [
     selectedServices.length > 0,
