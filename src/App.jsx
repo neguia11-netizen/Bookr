@@ -409,20 +409,57 @@ export default function BeautyBooking() {
     true,
   ];
 
-  function handleConfirm() {
+  async function handleConfirm() {
     const bookingDate = `${MONTHS[calMonth]} ${selectedDay}, ${calYear}`;
-    localStorage.setItem("bookingService", selectedServices.map(s => s.name).join(', '));
+    const duration = formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0));
+    const price = selectedServices.some(s => !s.price) ? "Price varies" : "$" + selectedServices.reduce((acc, s) => acc + (s.price || 0), 0).toFixed(2);
+    const name = `${form.first} ${form.last}`;
+    const inspoUrl = inspoFiles.map(f => f.url).filter(Boolean).join(",");
+
+    // Save all booking info to localStorage
+    localStorage.setItem("bookingService", selectedServices.map(s => s.name).join(", "));
     localStorage.setItem("bookingDate", bookingDate);
     localStorage.setItem("bookingTime", selectedTime);
-    localStorage.setItem("bookingDuration", formatDuration(selectedServices.reduce((acc, s) => acc + s.duration, 0)));
-    localStorage.setItem("bookingPrice", selectedServices.some(s => !s.price) ? 'Price varies' : '$' + selectedServices.reduce((acc, s) => acc + (s.price || 0), 0).toFixed(2));
-    localStorage.setItem("bookingName", `${form.first} ${form.last}`);
+    localStorage.setItem("bookingDuration", duration);
+    localStorage.setItem("bookingPrice", price);
+    localStorage.setItem("bookingName", name);
     localStorage.setItem("bookingEmail", form.email);
     localStorage.setItem("bookingPhone", form.phone);
     localStorage.setItem("bookingNotes", form.notes || "");
-    // Generate a temp ID that will be matched after Stripe payment
-    localStorage.setItem("bookingEmail", form.email);
-    localStorage.setItem("bookingInspo", inspoFiles.map(f => f.url).filter(Boolean).join(","));
+    localStorage.setItem("bookingInspo", inspoUrl);
+
+    // Pre-save pending booking to Supabase BEFORE going to Stripe
+    try {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation",
+        },
+        body: JSON.stringify({
+          service: selectedServices.map(s => s.name).join(", "),
+          date: bookingDate,
+          time: selectedTime,
+          duration,
+          price,
+          client_name: name,
+          client_email: form.email,
+          client_phone: form.phone,
+          notes: form.notes || "",
+          inspo_url: inspoUrl || null,
+          status: "pending",
+        }),
+      });
+      const [saved] = await res.json();
+      if (saved?.id) {
+        localStorage.setItem("bookingId", saved.id);
+      }
+    } catch(e) {
+      console.error("Pre-save failed:", e);
+    }
+
     setStep(4);
   }
 
