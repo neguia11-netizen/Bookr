@@ -298,6 +298,7 @@ export default function BeautyBooking() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState(false);
+  const [paying, setPaying] = useState(false);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [blockedDates, setBlockedDates] = useState([]);
   const [availabilityData, setAvailabilityData] = useState([]);
@@ -681,8 +682,27 @@ export default function BeautyBooking() {
                     Please complete payment below to secure your appointment.
                   </p>
                 </div>
-                <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}} onClick={() => { window.location.href = STRIPE_DEPOSIT_LINK; }}>
-                  Pay $10 Deposit ✦
+                <button className="btn btn-primary" style={{fontSize:13,padding:"16px 48px",letterSpacing:3}} disabled={paying} onClick={async () => {
+                  setPaying(true);
+                  try {
+                    const bookingId = localStorage.getItem("bookingId");
+                    const res = await fetch("/api/create-booking-checkout", {
+                      method: "POST",
+                      headers: {"Content-Type": "application/json"},
+                      body: JSON.stringify({
+                        bookingId,
+                        clientEmail: localStorage.getItem("bookingEmail"),
+                        clientName: localStorage.getItem("bookingName"),
+                        service: localStorage.getItem("bookingService"),
+                        date: localStorage.getItem("bookingDate"),
+                        time: localStorage.getItem("bookingTime"),
+                      }),
+                    });
+                    const data = await res.json();
+                    if (data.url) window.location.href = data.url;
+                  } catch(e) { setPaying(false); }
+                }}>
+                  {paying ? "Redirecting..." : "Pay $10 Deposit ✦"}
                 </button>
                 <p style={{fontSize:11,color:"var(--dim)",marginTop:16,letterSpacing:1}}>
                   Secured by Stripe · Your card info is never stored
