@@ -1,28 +1,5 @@
 import { useState, useEffect } from "react";
 
-const SUPABASE_URL = "https://yqiwwdedbvxfdrmmwdtr.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlxaXd3ZGVkYnZ4ZmRybW13ZHRyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyOTE0NTIsImV4cCI6MjA5MTg2NzQ1Mn0.SO5OgAKnZ0dkXhwAPgQqqgDM5kP4hhMONH_hrk33T6c";
-
-
-
-async function saveBooking(data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/bookings`, {
-    method: "POST",
-    headers: {
-      "apikey": SUPABASE_KEY,
-      "Authorization": `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      "Prefer": "return=representation",
-    },
-    body: JSON.stringify({ ...data, status: "paid" }),
-  });
-  if (!res.ok) throw new Error("Failed to save booking");
-  const [saved] = await res.json();
-  return saved;
-}
-
-
-
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap');
   :root {
@@ -166,53 +143,18 @@ export default function Success() {
     const service  = localStorage.getItem("bookingService");
     const date     = localStorage.getItem("bookingDate");
     const time     = localStorage.getItem("bookingTime");
-    const duration = localStorage.getItem("bookingDuration");
-    const price    = localStorage.getItem("bookingPrice");
     const name     = localStorage.getItem("bookingName");
-    const phone    = localStorage.getItem("bookingPhone");
-    const notes    = localStorage.getItem("bookingNotes") || "";
     const inspoRaw = localStorage.getItem("bookingInspo") || "";
     const inspoUrls = inspoRaw ? inspoRaw.split(',').filter(Boolean) : [];
 
     if (service && date && time) {
+      // Display-only: the booking record, confirmation email, owner
+      // notification, and loyalty tracking are all handled server-side
+      // by the Stripe webhook (api/stripe-webhook.js) once payment is
+      // confirmed. This page just reads the locally-stored form data
+      // to show a friendly confirmation — it must NOT write to Supabase
+      // or trigger emails itself, or bookings/emails get duplicated.
       setBooking({ service, date, time, name, email, inspoUrls });
-
-      // Save booking first to get ID, then send confirmation
-      saveBooking({
-        service, date, time, duration, price,
-        client_name: name,
-        client_email: email,
-        client_phone: phone,
-        notes,
-        inspo_url: inspoUrls.join(',') || null,
-      }).then(saved => {
-        const bookingId = saved?.id || "";
-        Promise.allSettled([
-          fetch("/api/send-confirmation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              secret: "faerie-confirm-2024",
-              booking: {
-                id: bookingId,
-                service, date, time, duration, price,
-                client_name: name,
-                client_email: email,
-                client_phone: phone,
-                notes: notes || "",
-                inspo_url: inspoUrls.join(',') || "",
-              }
-            }),
-          }),
-          // Track loyalty points
-          fetch("/api/loyalty", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, name, secret: "faerie-loyalty-2024" }),
-          }),
-        ]);
-      }).catch(err => console.error("Booking save error:", err));
-
       localStorage.clear();
     }
   }, []);
