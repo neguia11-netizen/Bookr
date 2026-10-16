@@ -786,7 +786,6 @@ export default function BeautyBooking() {
             <a href="/giftcard" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Gift Cards ✦</a>
 <a href="/about" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ About Me ✦</a>
             <a href="/pressons" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ Press-Ons ✦</a>
-            <a href="/naildesign" style={{fontSize:11,letterSpacing:3,textTransform:"uppercase",color:"var(--rose-lt)",textDecoration:"none",padding:"10px 24px",border:"1px solid var(--rose-dim)",background:"#200e18",display:"inline-block"}}>✦ AI Nail Design ✦</a>
           </div>
           <p className="footer-email">© 2026 Acrylic Faerie · San Antonio, TX · <a href="mailto:acrylicfaerie.biz@gmail.com">acrylicfaerie.biz@gmail.com</a></p>
         </div>
